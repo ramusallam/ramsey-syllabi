@@ -290,33 +290,14 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* ============== Placeholder panels ============== */
-  .placeholder {
-    margin-top: 10px;
-    padding: 64px 24px;
-    background: var(--bg-1);
-    border: 1px dashed var(--border-strong);
-    border-radius: 16px;
-    text-align: center;
+  /* Placeholder card for course-specific sections not handed over yet —
+     dashed variant of the section card so it reads as "reserved". */
+  .syllabus-grid .placeholder-section {
+    border-style: dashed;
+    border-color: var(--border-strong);
+    box-shadow: none;
   }
-  .placeholder svg {
-    width: 30px;
-    height: 30px;
-    color: var(--ink-low);
-    margin-bottom: 14px;
-  }
-  .placeholder h2 {
-    margin: 0 0 6px;
-    font-family: "Roboto Serif", Georgia, serif;
-    font-size: 21px;
-    font-weight: 700;
-    color: var(--ink-hi);
-  }
-  .placeholder p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--ink-mid);
-  }
+  .placeholder-section p { color: var(--ink-mid); }
 
   /* ============== Print: the open syllabus as a clean handout ============== */
   @media print {
@@ -426,30 +407,14 @@
       </div>
     </section>
 
-    <!-- ============== Placeholders ============== -->
-    <section class="panel" id="panel-chemistry" role="tabpanel" aria-labelledby="tab-chemistry" hidden>
-      <div class="placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <h2>Chemistry</h2>
-        <p>Syllabus coming soon.</p>
-      </div>
-    </section>
-
-    <section class="panel" id="panel-biochem" role="tabpanel" aria-labelledby="tab-biochem" hidden>
-      <div class="placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <h2>Medical Biochemistry</h2>
-        <p>Syllabus coming soon.</p>
-      </div>
-    </section>
-
-    <section class="panel" id="panel-neuro" role="tabpanel" aria-labelledby="tab-neuro" hidden>
-      <div class="placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <h2>Neuroscience</h2>
-        <p>Syllabus coming soon.</p>
-      </div>
-    </section>
+    <!-- ============== Other courses ==============
+         Filled by JS from one shared template: instructor band, AI use, and
+         Handbook are identical across every course (only the title changes),
+         so that copy lives ONCE in the script below. Course-specific sections
+         (projects, grading, late work, materials) are still to come. -->
+    <section class="panel" id="panel-chemistry" role="tabpanel" aria-labelledby="tab-chemistry" hidden></section>
+    <section class="panel" id="panel-biochem" role="tabpanel" aria-labelledby="tab-biochem" hidden></section>
+    <section class="panel" id="panel-neuro" role="tabpanel" aria-labelledby="tab-neuro" hidden></section>
   </main>
 </div>
 
@@ -464,15 +429,49 @@
   };
 
   const COURSE_NAMES = { d4sg: 'Design for Social Good', chemistry: 'Chemistry', biochem: 'Medical Biochemistry', neuro: 'Neuroscience' };
-  const pdfBtn = document.getElementById('pdf-btn');
+  // Shared across EVERY course — instructor contact, AI use, Handbook are
+  // identical school-wide; only the course title changes. Course-specific
+  // sections (projects, grading, late work, materials) arrive per course.
+  const INSTRUCTOR_BAND = `
+    <div class="syllabus-instructor">
+      <span class="si-eyebrow">Instructor</span>
+      <span class="si-name">Ramsey Musallam, EdD</span>
+      <span class="si-meta">
+        <a href="mailto:ramsey.musallam@sonomaacademy.org">ramsey.musallam@sonomaacademy.org</a>
+        <span class="si-dot">·</span>
+        <span>Office hours: every Coyote Block, Room B220</span>
+      </span>
+    </div>`;
+  const SHARED_SECTIONS = `
+    <section class="syllabus-section">
+      <h3 class="syllabus-section-title">AI use</h3>
+      <p>You may use AI engines (ChatGPT, Google Gemini, etc.) for tips, further explanations, and feedback, but not to produce or complete work you present as your own. Always check AI output for accuracy. For assessments and graded work, AI is only permitted when explicitly stated.</p>
+    </section>
+    <section class="syllabus-section">
+      <h3 class="syllabus-section-title">Handbook</h3>
+      <p>Attendance, phone use, and full academic integrity guidelines follow the Sonoma Academy <a href="https://drive.google.com/file/d/1-_pbED22jMGVKLCVQPnmL5oVD8YXQGCP/view" target="_blank" rel="noopener">Student Handbook ↗</a>.</p>
+    </section>`;
+
+  // Courses whose specific sections haven't been handed over yet: shared
+  // sections now, a quiet placeholder card for the rest.
+  ['chemistry', 'biochem', 'neuro'].forEach(course => {
+    document.getElementById('panel-' + course).innerHTML = `
+      <h2 class="course-name">${COURSE_NAMES[course]}</h2>
+      ${INSTRUCTOR_BAND}
+      <div class="syllabus-grid">
+        ${SHARED_SECTIONS}
+        <section class="syllabus-section placeholder-section">
+          <h3 class="syllabus-section-title">Full syllabus</h3>
+          <p>Course description, projects, grading, and materials coming soon.</p>
+        </section>
+      </div>`;
+  });
 
   function select(course, updateHash) {
     if (!panels[course]) course = 'd4sg';
     tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.course === course)));
     Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== course; });
-    // PDF button only where there's a syllabus to save; the title names the
-    // saved file after the open course.
-    pdfBtn.hidden = !!panels[course].querySelector('.placeholder');
+    // The title names the saved PDF after the open course.
     document.title = "Ramsey's Syllabi · " + COURSE_NAMES[course];
     if (updateHash) history.replaceState(null, '', course === 'd4sg' ? location.pathname : '#' + course);
   }
