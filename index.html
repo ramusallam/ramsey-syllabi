@@ -75,6 +75,40 @@
   }
   .site-title .accent { color: var(--accent); }
 
+  /* Title row: title left, PDF button right — same grammar as the Companion
+     hero's Save Course PDF. Stacks on phones. */
+  .site-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pdf-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 9px 16px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--bg-1);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .pdf-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .pdf-btn svg { width: 15px; height: 15px; }
+  .pdf-btn[hidden] { display: none; }
+
   .tabs {
     display: flex;
     gap: 8px;
@@ -283,6 +317,25 @@
     font-size: 14px;
     color: var(--ink-mid);
   }
+
+  /* ============== Print: the open syllabus as a clean handout ============== */
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .site-eyebrow, .tabs, .pdf-btn { display: none !important; }
+    header.site { padding-top: 0; }
+    .site-title { font-size: 22px; }
+    main { padding: 18px 0 0; }
+    .course-name { font-size: 20px; }
+    .syllabus-grid { grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .syllabus-grid .syllabus-section {
+      box-shadow: none;
+      border: 1px solid var(--border);
+      break-inside: avoid;
+      padding: 14px 16px;
+    }
+    .syllabus-section p, .syllabus-list, .syllabus-dl dt, .syllabus-dl dd { font-size: 12.5px; }
+    .syllabus-section a { border-bottom: none; }
+  }
 </style>
 </head>
 <body>
@@ -290,7 +343,13 @@
 <div class="wrap">
   <header class="site">
     <p class="site-eyebrow">Sonoma Academy · Course Syllabi</p>
-    <h1 class="site-title">Ramsey&rsquo;s <span class="accent">Syllabi</span></h1>
+    <div class="site-title-row">
+      <h1 class="site-title">Ramsey&rsquo;s <span class="accent">Syllabi</span></h1>
+      <button class="pdf-btn" id="pdf-btn" type="button" aria-label="Save this syllabus as a PDF" onclick="window.print()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+        Save PDF
+      </button>
+    </div>
     <nav class="tabs" role="tablist" aria-label="Courses">
       <button class="tab" role="tab" id="tab-d4sg" aria-selected="true" aria-controls="panel-d4sg" data-course="d4sg">Design for Social Good</button>
       <button class="tab" role="tab" id="tab-chemistry" aria-selected="false" aria-controls="panel-chemistry" data-course="chemistry">Chemistry</button>
@@ -404,10 +463,17 @@
     neuro: document.getElementById('panel-neuro'),
   };
 
+  const COURSE_NAMES = { d4sg: 'Design for Social Good', chemistry: 'Chemistry', biochem: 'Medical Biochemistry', neuro: 'Neuroscience' };
+  const pdfBtn = document.getElementById('pdf-btn');
+
   function select(course, updateHash) {
     if (!panels[course]) course = 'd4sg';
     tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.course === course)));
     Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== course; });
+    // PDF button only where there's a syllabus to save; the title names the
+    // saved file after the open course.
+    pdfBtn.hidden = !!panels[course].querySelector('.placeholder');
+    document.title = "Ramsey's Syllabi · " + COURSE_NAMES[course];
     if (updateHash) history.replaceState(null, '', course === 'd4sg' ? location.pathname : '#' + course);
   }
 
