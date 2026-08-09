@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ramsey's Syllabi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&family=Roboto+Serif:wght@400;500;600;700;800&display=swap" />
+<style>
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  :root {
+    /* Spark Learning aesthetic — warm cream page, white cards, indigo accent.
+       Tokens mirror the D4SG hub / Studio / Companion so every surface feels
+       like the same world. */
+    --bg-0: #F7F3EE;
+    --bg-1: #FFFFFF;
+    --bg-2: #FAF7F1;
+    --ink-hi: #1C1917;
+    --ink-mid: #57534E;
+    --ink-low: #A0937B;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --accent-soft: #EEF2FF;
+    --border: #E8E0D2;
+    --border-strong: #D6CDB8;
+    --paper-ink: #1C1917;
+    --shadow-sm: 0 1px 2px rgba(17, 17, 17, 0.04), 0 1px 3px rgba(17, 17, 17, 0.06);
+    --shadow-md: 0 4px 12px rgba(17, 17, 17, 0.06), 0 2px 4px rgba(17, 17, 17, 0.04);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    background: var(--bg-0);
+    color: var(--ink-hi);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+    font-size: 13px;
+  }
+
+  .wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 22px;
+  }
+
+  /* ============== Header: title + course tabs ============== */
+  header.site {
+    padding: 42px 0 0;
+  }
+  .site-eyebrow {
+    margin: 0 0 10px;
+    font-family: "Roboto Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .site-title {
+    margin: 0;
+    font-family: "Roboto Serif", Georgia, serif;
+    font-size: clamp(30px, 4.4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    color: var(--ink-hi);
+  }
+  .site-title .accent { color: var(--accent); }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-top: 26px;
+    padding-bottom: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    appearance: none;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-1);
+    color: var(--ink-mid);
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .tab:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .tab[aria-selected="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  main {
+    padding: 30px 0 72px;
+  }
+  .panel[hidden] { display: none; }
+
+  /* ============== Syllabus — copied from the D4SG hub so every syllabus
+     reads like the same printed handout: lede, instructor band, then a grid
+     of quietly-titled card sections. ============== */
+  .syllabus-lead { max-width: 880px; }
+  .syllabus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+    margin-top: 22px;
+    align-items: start;
+  }
+  .syllabus-grid .syllabus-section {
+    margin: 0;
+    padding: 20px 22px;
+    border-top: none;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .syllabus-instructor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+    margin: 4px 0 26px;
+    padding: 13px 18px;
+    background: var(--accent-soft);
+    border-radius: 12px;
+  }
+  .syllabus-instructor .si-eyebrow {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .syllabus-instructor .si-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink-hi);
+  }
+  .syllabus-instructor .si-meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13.5px;
+    color: var(--ink-mid);
+  }
+  .syllabus-instructor a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.30);
+    transition: border-color 0.15s ease;
+  }
+  .syllabus-instructor a:hover { border-bottom-color: var(--accent); }
+  .syllabus-instructor .si-dot { color: var(--ink-low); }
+
+  .course-name {
+    margin: 0 0 16px;
+    font-family: "Roboto Serif", Georgia, serif;
+    font-size: clamp(22px, 2.6vw, 28px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink-hi);
+    line-height: 1.15;
+  }
+
+  .syllabus-section {
+    padding: 26px 0 4px;
+    border-top: 1px solid var(--border);
+  }
+  .syllabus-section:first-of-type {
+    border-top: none;
+    padding-top: 8px;
+  }
+  .syllabus-section-title {
+    margin: 0 0 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .syllabus-section p {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--paper-ink);
+  }
+  .syllabus-section p + p { margin-top: 12px; }
+  .syllabus-section strong { color: var(--ink-hi); }
+  .syllabus-section em { color: var(--ink-low); font-style: italic; }
+  .syllabus-section a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.30);
+    transition: border-color 0.15s ease;
+  }
+  .syllabus-section a:hover { border-bottom-color: var(--accent); }
+
+  .syllabus-list {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--paper-ink);
+  }
+  .syllabus-list strong { color: var(--ink-hi); }
+
+  .syllabus-dl {
+    margin: 0;
+    display: grid;
+    gap: 8px 0;
+  }
+  .syllabus-dl > div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .syllabus-dl > div:last-child { border-bottom: none; }
+  .syllabus-dl dt {
+    margin: 0;
+    font-size: 15.5px;
+    color: var(--ink-hi);
+    font-weight: 600;
+  }
+  .syllabus-dl dd {
+    margin: 0;
+    font-size: 15.5px;
+    color: var(--accent);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============== Placeholder panels ============== */
+  .placeholder {
+    margin-top: 10px;
+    padding: 64px 24px;
+    background: var(--bg-1);
+    border: 1px dashed var(--border-strong);
+    border-radius: 16px;
+    text-align: center;
+  }
+  .placeholder svg {
+    width: 30px;
+    height: 30px;
+    color: var(--ink-low);
+    margin-bottom: 14px;
+  }
+  .placeholder h2 {
+    margin: 0 0 6px;
+    font-family: "Roboto Serif", Georgia, serif;
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--ink-hi);
+  }
+  .placeholder p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-mid);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="site">
+    <p class="site-eyebrow">Sonoma Academy · Course Syllabi</p>
+    <h1 class="site-title">Ramsey&rsquo;s <span class="accent">Syllabi</span></h1>
+    <nav class="tabs" role="tablist" aria-label="Courses">
+      <button class="tab" role="tab" id="tab-d4sg" aria-selected="true" aria-controls="panel-d4sg" data-course="d4sg">Design for Social Good</button>
+      <button class="tab" role="tab" id="tab-chemistry" aria-selected="false" aria-controls="panel-chemistry" data-course="chemistry">Chemistry</button>
+      <button class="tab" role="tab" id="tab-biochem" aria-selected="false" aria-controls="panel-biochem" data-course="biochem">Medical Biochemistry</button>
+      <button class="tab" role="tab" id="tab-neuro" aria-selected="false" aria-controls="panel-neuro" data-course="neuro">Neuroscience</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============== D4SG ============== -->
+    <section class="panel" id="panel-d4sg" role="tabpanel" aria-labelledby="tab-d4sg">
+      <h2 class="course-name">Design for Social Good</h2>
+
+      <div class="syllabus-instructor">
+        <span class="si-eyebrow">Instructor</span>
+        <span class="si-name">Ramsey Musallam, EdD</span>
+        <span class="si-meta">
+          <a href="mailto:ramsey.musallam@sonomaacademy.org">ramsey.musallam@sonomaacademy.org</a>
+          <span class="si-dot">·</span>
+          <span>Office hours: every Coyote Block, Room B220</span>
+        </span>
+      </div>
+
+      <section class="syllabus-section syllabus-lead">
+        <p>Design for Social Good is a project-based class where students practice human-centered design thinking on a real need in the world. This semester the theme is <strong>assistive technology for computer access</strong>. Students build low-cost, open-source adaptive controllers, switches, and sensors that let an end-user operate a computer using whatever motion they can reliably make, at a fraction of the cost of commercial gear. The social good at the center is straightforward: assistive technology lets individuals with disabilities participate in society on the same terms as everyone else.</p>
+      </section>
+
+      <div class="syllabus-grid">
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Projects</h3>
+        <ul class="syllabus-list">
+          <li><strong>Project 0:</strong> Meet the Mission</li>
+          <li><strong>Project 1:</strong> Basic Adaptive Switches</li>
+          <li><strong>Project 2:</strong> No-Force Sensors</li>
+          <li><strong>Project 3:</strong> Hands-Free Controls</li>
+          <li><strong>Project 4:</strong> Adaptive Controller Hub</li>
+          <li><strong>Final Project:</strong> Instructable</li>
+        </ul>
+      </section>
+
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Grading</h3>
+        <dl class="syllabus-dl">
+          <div><dt>Projects</dt><dd>~ 60%</dd></div>
+          <div><dt>Homework</dt><dd>~ 20%</dd></div>
+          <div><dt>Final Project</dt><dd>~ 20%</dd></div>
+        </dl>
+      </section>
+
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Late work</h3>
+        <dl class="syllabus-dl">
+          <div><dt>Projects</dt><dd>deadlines case by case</dd></div>
+          <div><dt>Revisions</dt><dd>up to 50% credit back</dd></div>
+          <div><dt>Homework</dt><dd>10% off, Friday 4:00 PM cutoff</dd></div>
+        </dl>
+      </section>
+
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">AI use</h3>
+        <p>You may use AI engines (ChatGPT, Google Gemini, etc.) for tips, further explanations, and feedback, but not to produce or complete work you present as your own. Always check AI output for accuracy. For assessments and graded work, AI is only permitted when explicitly stated.</p>
+        <p>Given the nature of this course, AI is intentionally leveraged in a <strong>Vibe Coding</strong> capacity to supplement and bring to life student design prototypes and concepts. That use is built into the projects and is encouraged.</p>
+      </section>
+
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Materials</h3>
+        <p>A laptop with reliable internet running Chrome or Edge (the Vibe Coding editor uploads to your Arduino over Web Serial, which only those browsers support). All prototyping materials (Arduino, switches, sensors, perfboard, solder, 3D-print filament, consumables) are provided in class.</p>
+      </section>
+
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Handbook</h3>
+        <p>Attendance, phone use, and full academic integrity guidelines follow the Sonoma Academy <a href="https://drive.google.com/file/d/1-_pbED22jMGVKLCVQPnmL5oVD8YXQGCP/view" target="_blank" rel="noopener">Student Handbook ↗</a>.</p>
+      </section>
+      </div>
+    </section>
+
+    <!-- ============== Placeholders ============== -->
+    <section class="panel" id="panel-chemistry" role="tabpanel" aria-labelledby="tab-chemistry" hidden>
+      <div class="placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <h2>Chemistry</h2>
+        <p>Syllabus coming soon.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-biochem" role="tabpanel" aria-labelledby="tab-biochem" hidden>
+      <div class="placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <h2>Medical Biochemistry</h2>
+        <p>Syllabus coming soon.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-neuro" role="tabpanel" aria-labelledby="tab-neuro" hidden>
+      <div class="placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <h2>Neuroscience</h2>
+        <p>Syllabus coming soon.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // Tab switcher with shareable hashes (#chemistry opens that course).
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const panels = {
+    d4sg: document.getElementById('panel-d4sg'),
+    chemistry: document.getElementById('panel-chemistry'),
+    biochem: document.getElementById('panel-biochem'),
+    neuro: document.getElementById('panel-neuro'),
+  };
+
+  function select(course, updateHash) {
+    if (!panels[course]) course = 'd4sg';
+    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.course === course)));
+    Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== course; });
+    if (updateHash) history.replaceState(null, '', course === 'd4sg' ? location.pathname : '#' + course);
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => select(t.dataset.course, true)));
+  window.addEventListener('hashchange', () => select(location.hash.slice(1) || 'd4sg', false));
+  select(location.hash.slice(1) || 'd4sg', false);
+</script>
+
+</body>
+</html>
