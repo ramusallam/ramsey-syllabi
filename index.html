@@ -14,7 +14,7 @@
   }
   :root {
     /* Spark Learning aesthetic — warm cream page, white cards, indigo accent.
-       Tokens mirror the D4SG hub / Studio / Companion so every surface feels
+       Tokens mirror the T4SG hub / Studio / Companion so every surface feels
        like the same world. */
     --bg-0: #F7F3EE;
     --bg-1: #FFFFFF;
@@ -148,7 +148,7 @@
   }
   .panel[hidden] { display: none; }
 
-  /* ============== Syllabus — copied from the D4SG hub so every syllabus
+  /* ============== Syllabus — copied from the T4SG hub so every syllabus
      reads like the same printed handout: lede, instructor band, then a grid
      of quietly-titled card sections. ============== */
   .syllabus-lead { max-width: 880px; }
@@ -332,7 +332,7 @@
       </button>
     </div>
     <nav class="tabs" role="tablist" aria-label="Courses">
-      <button class="tab" role="tab" id="tab-d4sg" aria-selected="true" aria-controls="panel-d4sg" data-course="d4sg">Design for Social Good</button>
+      <button class="tab" role="tab" id="tab-t4sg" aria-selected="true" aria-controls="panel-t4sg" data-course="t4sg">Tech for Social Good</button>
       <button class="tab" role="tab" id="tab-chemistry" aria-selected="false" aria-controls="panel-chemistry" data-course="chemistry">Chemistry</button>
       <button class="tab" role="tab" id="tab-biochem" aria-selected="false" aria-controls="panel-biochem" data-course="biochem">Medical Biochemistry</button>
       <button class="tab" role="tab" id="tab-neuro" aria-selected="false" aria-controls="panel-neuro" data-course="neuro">Neuroscience</button>
@@ -340,9 +340,9 @@
   </header>
 
   <main>
-    <!-- ============== D4SG ============== -->
-    <section class="panel" id="panel-d4sg" role="tabpanel" aria-labelledby="tab-d4sg">
-      <h2 class="course-name">Design for Social Good</h2>
+    <!-- ============== T4SG ============== -->
+    <section class="panel" id="panel-t4sg" role="tabpanel" aria-labelledby="tab-t4sg">
+      <h2 class="course-name">Tech for Social Good</h2>
 
       <div class="syllabus-instructor">
         <span class="si-eyebrow">Instructor</span>
@@ -355,7 +355,7 @@
       </div>
 
       <section class="syllabus-section syllabus-lead">
-        <p>Design for Social Good is a project-based class where students practice human-centered design thinking on a real need in the world. This semester the theme is <strong>assistive technology for computer access</strong>. Students build low-cost, open-source adaptive controllers, switches, and sensors that let an end-user operate a computer using whatever motion they can reliably make, at a fraction of the cost of commercial gear. The social good at the center is straightforward: assistive technology lets individuals with disabilities participate in society on the same terms as everyone else.</p>
+        <p>Tech for Social Good is a project-based class where students practice human-centered design thinking on a real need in the world. This semester the theme is <strong>assistive technology for computer access</strong>. Students build low-cost, open-source adaptive controllers, switches, and sensors that let an end-user operate a computer using whatever motion they can reliably make, at a fraction of the cost of commercial gear. The social good at the center is straightforward: assistive technology lets individuals with disabilities participate in society on the same terms as everyone else.</p>
       </section>
 
       <div class="syllabus-grid">
@@ -422,13 +422,13 @@
   // Tab switcher with shareable hashes (#chemistry opens that course).
   const tabs = Array.from(document.querySelectorAll('.tab'));
   const panels = {
-    d4sg: document.getElementById('panel-d4sg'),
+    t4sg: document.getElementById('panel-t4sg'),
     chemistry: document.getElementById('panel-chemistry'),
     biochem: document.getElementById('panel-biochem'),
     neuro: document.getElementById('panel-neuro'),
   };
 
-  const COURSE_NAMES = { d4sg: 'Design for Social Good', chemistry: 'Chemistry', biochem: 'Medical Biochemistry', neuro: 'Neuroscience' };
+  const COURSE_NAMES = { t4sg: 'Tech for Social Good', chemistry: 'Chemistry', biochem: 'Medical Biochemistry', neuro: 'Neuroscience' };
   // Shared across EVERY course — instructor contact, AI use, Handbook are
   // identical school-wide; only the course title changes. Course-specific
   // sections (projects, grading, late work, materials) arrive per course.
@@ -468,17 +468,17 @@
   });
 
   function select(course, updateHash) {
-    if (!panels[course]) course = 'd4sg';
+    if (!panels[course]) course = 't4sg';
     tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.course === course)));
     Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== course; });
     // The title names the saved PDF after the open course.
     document.title = "Ramsey's Syllabi · " + COURSE_NAMES[course];
-    if (updateHash) history.replaceState(null, '', course === 'd4sg' ? location.pathname : '#' + course);
+    if (updateHash) history.replaceState(null, '', course === 't4sg' ? location.pathname : '#' + course);
   }
 
   tabs.forEach(t => t.addEventListener('click', () => select(t.dataset.course, true)));
-  window.addEventListener('hashchange', () => select(location.hash.slice(1) || 'd4sg', false));
-  select(location.hash.slice(1) || 'd4sg', false);
+  window.addEventListener('hashchange', () => select(location.hash.slice(1) || 't4sg', false));
+  select(location.hash.slice(1) || 't4sg', false);
 </script>
 
 </body>
