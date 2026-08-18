@@ -152,15 +152,17 @@
      reads like the same printed handout: lede, instructor band, then a grid
      of quietly-titled card sections. ============== */
   .syllabus-lead { max-width: 880px; }
+  /* Masonry via CSS columns: cards pack under each other with no row gaps
+     (a grid row is as tall as its tallest card, which left holes). Columns
+     auto-collapse to one on phones. */
   .syllabus-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 18px;
+    columns: 3 300px;
+    column-gap: 18px;
     margin-top: 22px;
-    align-items: start;
   }
   .syllabus-grid .syllabus-section {
-    margin: 0;
+    break-inside: avoid;
+    margin: 0 0 18px;
     padding: 20px 22px;
     border-top: none;
     background: var(--bg-1);
@@ -363,11 +365,12 @@
     .site-title { font-size: 22px; }
     main { padding: 18px 0 0; }
     .course-name { font-size: 20px; }
-    .syllabus-grid { grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .syllabus-grid { columns: 2; column-gap: 12px; margin-top: 14px; }
     .syllabus-grid .syllabus-section {
       box-shadow: none;
       border: 1px solid var(--border);
       break-inside: avoid;
+      margin-bottom: 12px;
       padding: 14px 16px;
     }
     .syllabus-section p, .syllabus-list, .syllabus-dl dt, .syllabus-dl dd { font-size: 12.5px; }
