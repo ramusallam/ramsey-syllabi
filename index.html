@@ -290,6 +290,62 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Stacked rows for sentence-length values (policies, guidelines): bold
+     term on its own line, plain sentence under it. The two-column .syllabus-dl
+     stays for SHORT numeric values only (grading percentages) — sentence
+     values in that layout wrap into a ragged right column. */
+  .syllabus-rows {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .syllabus-rows > div {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .syllabus-rows > div:first-child { padding-top: 2px; }
+  .syllabus-rows > div:last-child { border-bottom: none; padding-bottom: 2px; }
+  .syllabus-rows dt {
+    margin: 0 0 2px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink-hi);
+  }
+  .syllabus-rows dd {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-mid);
+  }
+  .syllabus-rows dd a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.30);
+  }
+  .syllabus-rows dd a:hover { border-bottom-color: var(--accent); }
+
+  .section-note {
+    margin-top: 12px !important;
+    font-size: 13px !important;
+    color: var(--ink-low) !important;
+  }
+
+  /* Block chip next to the course name — placeholder until blocks are set. */
+  .course-block {
+    display: inline-block;
+    margin-left: 12px;
+    vertical-align: 3px;
+    font-family: "Roboto Mono", monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--ink-low);
+    border: 1px dashed var(--border-strong);
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+
   /* Placeholder card for course-specific sections not handed over yet —
      dashed variant of the section card so it reads as "reserved". */
   .syllabus-grid .placeholder-section {
@@ -344,7 +400,7 @@
          THIS is the T4SG syllabus's single home. The T4SG class hub's
          /syllabus page links here instead of carrying its own copy. -->
     <section class="panel" id="panel-t4sg" role="tabpanel" aria-labelledby="tab-t4sg">
-      <h2 class="course-name">Technology for Social Good (T4SG)</h2>
+      <h2 class="course-name">Technology for Social Good (T4SG)<span class="course-block">Block TBD</span></h2>
 
       <div class="syllabus-instructor">
         <span class="si-eyebrow">Instructor</span>
@@ -357,12 +413,13 @@
       </div>
 
       <section class="syllabus-section syllabus-lead">
+        <h3 class="syllabus-section-title">Course Description</h3>
         <p>Technology for Social Good is a project-based class where students practice human-centered design thinking on a real need in the world. This semester the theme is <strong>assistive technology for computer access</strong>. Students build low-cost, open-source adaptive controllers, switches, and sensors that let an end-user operate a computer using whatever motion they can reliably make, at a fraction of the cost of commercial gear. The social good at the center is straightforward: assistive technology lets individuals with disabilities participate in society on the same terms as everyone else.</p>
       </section>
 
       <div class="syllabus-grid">
       <section class="syllabus-section">
-        <h3 class="syllabus-section-title">Projects</h3>
+        <h3 class="syllabus-section-title">Course Outline</h3>
         <ul class="syllabus-list">
           <li><strong>Project 0:</strong> Meet the Mission</li>
           <li><strong>Project 1:</strong> Basic Adaptive Switches</li>
@@ -374,7 +431,7 @@
       </section>
 
       <section class="syllabus-section">
-        <h3 class="syllabus-section-title">Grading</h3>
+        <h3 class="syllabus-section-title">Grading Overview</h3>
         <dl class="syllabus-dl">
           <div><dt>Projects</dt><dd>~ 60%</dd></div>
           <div><dt>Homework</dt><dd>~ 20%</dd></div>
@@ -383,37 +440,32 @@
       </section>
 
       <section class="syllabus-section">
-        <h3 class="syllabus-section-title">Late work</h3>
-        <dl class="syllabus-dl">
-          <div><dt>Projects</dt><dd>deadlines case by case</dd></div>
-          <div><dt>Revisions</dt><dd>up to 50% credit back</dd></div>
-          <div><dt>Homework</dt><dd>10% off, Friday 4:00 PM cutoff</dd></div>
-        </dl>
+        <h3 class="syllabus-section-title">Required Materials</h3>
+        <p>A laptop with reliable internet running Chrome or Edge (the Vibe Coding editor uploads to your Arduino over Web Serial, which only those browsers support). All prototyping materials (Arduino, switches, sensors, perfboard, solder, 3D-print filament, consumables) are provided in class.</p>
       </section>
 
       <section class="syllabus-section">
-        <h3 class="syllabus-section-title">AI use</h3>
+        <h3 class="syllabus-section-title">Class Guidelines</h3>
+        <dl class="syllabus-rows">
+          <div><dt>Late work</dt><dd>Project deadlines are handled case by case. Homework is 10% off, with a Friday 4:00 PM cutoff.</dd></div>
+          <div><dt>Revisions</dt><dd>Revise submitted work for up to 50% of the credit back.</dd></div>
+        </dl>
+        <p class="section-note">Coming soon: make-up work, reassessments, accommodations, college visits.</p>
+      </section>
+
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">AI Policy</h3>
         <p>You may use AI engines (ChatGPT, Google Gemini, etc.) for tips, further explanations, and feedback, but not to produce or complete work you present as your own. Always check AI output for accuracy. For assessments and graded work, AI is only permitted when explicitly stated.</p>
         <p>Given the nature of this course, AI is intentionally leveraged in a <strong>Vibe Coding</strong> capacity to supplement and bring to life student design prototypes and concepts. That use is built into the projects and is encouraged.</p>
       </section>
 
       <section class="syllabus-section">
-        <h3 class="syllabus-section-title">Materials</h3>
-        <p>A laptop with reliable internet running Chrome or Edge (the Vibe Coding editor uploads to your Arduino over Web Serial, which only those browsers support). All prototyping materials (Arduino, switches, sensors, perfboard, solder, 3D-print filament, consumables) are provided in class.</p>
-      </section>
-
-      <section class="syllabus-section">
-        <h3 class="syllabus-section-title">School policies</h3>
-        <dl class="syllabus-dl">
-          <div><dt>Cell phones</dt><dd>per the Student Handbook, unchanged from last year</dd></div>
-          <div><dt>Attendance</dt><dd><a href="https://docs.google.com/document/d/1bWm1EaeeQiqTXq6UFJuw_zyMqL5GR9oI32ZScgMJ5MI/edit?usp=sharing" target="_blank" rel="noopener">Handbook attendance policy ↗</a></dd></div>
-          <div><dt>Everything else</dt><dd><a href="https://drive.google.com/file/d/1q5lIpmiZsv2W1Dd-c_st8j67pABHQHS3/view" target="_blank" rel="noopener">Student Handbook ↗</a></dd></div>
+        <h3 class="syllabus-section-title">School Policies</h3>
+        <dl class="syllabus-rows">
+          <div><dt>Cell phones</dt><dd>Per the Student Handbook, unchanged from last year.</dd></div>
+          <div><dt>Attendance</dt><dd>Follows the <a href="https://docs.google.com/document/d/1bWm1EaeeQiqTXq6UFJuw_zyMqL5GR9oI32ZScgMJ5MI/edit?usp=sharing" target="_blank" rel="noopener">Handbook attendance policy ↗</a></dd></div>
+          <div><dt>Everything else</dt><dd>See the <a href="https://drive.google.com/file/d/1q5lIpmiZsv2W1Dd-c_st8j67pABHQHS3/view" target="_blank" rel="noopener">Student Handbook ↗</a></dd></div>
         </dl>
-      </section>
-
-      <section class="syllabus-section placeholder-section">
-        <h3 class="syllabus-section-title">Class guidelines</h3>
-        <p>Coming soon: block, make-up work, reassessments, accommodations, college visits.</p>
       </section>
       </div>
     </section>
@@ -455,15 +507,15 @@
     </div>`;
   const SHARED_SECTIONS = `
     <section class="syllabus-section">
-      <h3 class="syllabus-section-title">AI use</h3>
+      <h3 class="syllabus-section-title">AI Policy</h3>
       <p>You may use AI engines (ChatGPT, Google Gemini, etc.) for tips, further explanations, and feedback, but not to produce or complete work you present as your own. Always check AI output for accuracy. For assessments and graded work, AI is only permitted when explicitly stated.</p>
     </section>
     <section class="syllabus-section">
-      <h3 class="syllabus-section-title">School policies</h3>
-      <dl class="syllabus-dl">
-        <div><dt>Cell phones</dt><dd>per the Student Handbook, unchanged from last year</dd></div>
-        <div><dt>Attendance</dt><dd><a href="https://docs.google.com/document/d/1bWm1EaeeQiqTXq6UFJuw_zyMqL5GR9oI32ZScgMJ5MI/edit?usp=sharing" target="_blank" rel="noopener">Handbook attendance policy ↗</a></dd></div>
-        <div><dt>Everything else</dt><dd><a href="https://drive.google.com/file/d/1q5lIpmiZsv2W1Dd-c_st8j67pABHQHS3/view" target="_blank" rel="noopener">Student Handbook ↗</a></dd></div>
+      <h3 class="syllabus-section-title">School Policies</h3>
+      <dl class="syllabus-rows">
+        <div><dt>Cell phones</dt><dd>Per the Student Handbook, unchanged from last year.</dd></div>
+        <div><dt>Attendance</dt><dd>Follows the <a href="https://docs.google.com/document/d/1bWm1EaeeQiqTXq6UFJuw_zyMqL5GR9oI32ZScgMJ5MI/edit?usp=sharing" target="_blank" rel="noopener">Handbook attendance policy ↗</a></dd></div>
+        <div><dt>Everything else</dt><dd>See the <a href="https://drive.google.com/file/d/1q5lIpmiZsv2W1Dd-c_st8j67pABHQHS3/view" target="_blank" rel="noopener">Student Handbook ↗</a></dd></div>
       </dl>
     </section>`;
 
@@ -471,13 +523,13 @@
   // sections now, a quiet placeholder card for the rest.
   ['chemistry', 'biochem', 'neuro'].forEach(course => {
     document.getElementById('panel-' + course).innerHTML = `
-      <h2 class="course-name">${COURSE_NAMES[course]}</h2>
+      <h2 class="course-name">${COURSE_NAMES[course]}<span class="course-block">Block TBD</span></h2>
       ${INSTRUCTOR_BAND}
       <div class="syllabus-grid">
         ${SHARED_SECTIONS}
         <section class="syllabus-section placeholder-section">
-          <h3 class="syllabus-section-title">Full syllabus</h3>
-          <p>Coming soon: block, course description, units, required materials, grading overview, and class guidelines (late work, make-up work, reassessments, accommodations, college visits).</p>
+          <h3 class="syllabus-section-title">Full Syllabus</h3>
+          <p>Coming soon: course description, course outline, required materials, grading overview, and class guidelines (late work, make-up work, reassessments, accommodations, college visits).</p>
         </section>
       </div>`;
   });
