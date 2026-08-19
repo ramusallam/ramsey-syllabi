@@ -227,6 +227,14 @@
     line-height: 1.15;
   }
 
+  /* Roboto Serif has no lining-figure alternates; its "4" tops out below cap
+     height and dips under the baseline, so lift it to sit flush with the caps.
+     Same rule as the T4SG hub header. */
+  .course-name .fig {
+    display: inline-block;
+    transform: translateY(-0.063em);
+  }
+
   .syllabus-section {
     padding: 26px 0 4px;
     border-top: 1px solid var(--border);
@@ -449,7 +457,7 @@
          THIS is the T4SG syllabus's single home. The T4SG class hub's
          /syllabus page links here instead of carrying its own copy. -->
     <section class="panel" id="panel-t4sg" role="tabpanel" aria-labelledby="tab-t4sg">
-      <h2 class="course-name">Technology for Social Good (T4SG)<span class="course-block">Block C</span></h2>
+      <h2 class="course-name">Technology for Social Good (T<span class="fig">4</span>SG)<span class="course-block">Block C</span></h2>
 
       <div class="syllabus-instructor">
         <span class="si-eyebrow">Instructor</span>
