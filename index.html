@@ -12,6 +12,14 @@
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
   :root {
     /* Spark Learning aesthetic — warm cream page, white cards, indigo accent.
        Tokens mirror the T4SG hub / Studio / Companion so every surface feels
@@ -422,17 +430,17 @@
   <header class="site">
     <p class="site-eyebrow">Sonoma Academy · Course Syllabi</p>
     <div class="site-title-row">
-      <h1 class="site-title">Ramsey&rsquo;s <span class="accent">Syllabi</span></h1>
+      <h1 class="site-title">Ramsey's <span class="accent">Syllabi</span></h1>
       <button class="pdf-btn" id="pdf-btn" type="button" aria-label="Save this syllabus as a PDF" onclick="window.print()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
         Save PDF
       </button>
     </div>
-    <nav class="tabs" role="tablist" aria-label="Courses">
-      <button class="tab" role="tab" id="tab-t4sg" aria-selected="true" aria-controls="panel-t4sg" data-course="t4sg">T4SG</button>
-      <button class="tab" role="tab" id="tab-chemistry" aria-selected="false" aria-controls="panel-chemistry" data-course="chemistry">Chemistry</button>
-      <button class="tab" role="tab" id="tab-biochem" aria-selected="false" aria-controls="panel-biochem" data-course="biochem">Medical Biochemistry</button>
-      <button class="tab" role="tab" id="tab-neuro" aria-selected="false" aria-controls="panel-neuro" data-course="neuro">Neuroscience</button>
+    <nav class="tabs" role="tablist" aria-label="Courses" aria-orientation="horizontal">
+      <button class="tab" role="tab" id="tab-t4sg" aria-selected="true" aria-controls="panel-t4sg" tabindex="0" data-course="t4sg">T4SG</button>
+      <button class="tab" role="tab" id="tab-chemistry" aria-selected="false" aria-controls="panel-chemistry" tabindex="-1" data-course="chemistry">Chemistry</button>
+      <button class="tab" role="tab" id="tab-biochem" aria-selected="false" aria-controls="panel-biochem" tabindex="-1" data-course="biochem">Medical Biochemistry</button>
+      <button class="tab" role="tab" id="tab-neuro" aria-selected="false" aria-controls="panel-neuro" tabindex="-1" data-course="neuro">Neuroscience</button>
     </nav>
   </header>
 
@@ -595,8 +603,7 @@
         </section>
         <section class="syllabus-section">
           <h3 class="syllabus-section-title">How the Grading Works</h3>
-          <p>Daily work is where learning happens. Assessments are where it shows.</p>
-          <p>Homework, labs, simulations, and practice all live in the workbook, where mistakes cost nothing. Keep up with it and you walk into assessments ready. Skip it and assessment day is your first real practice.</p>
+          <p>Daily work is where learning happens, and assessments are where it shows. Homework, labs, simulations, and practice all live in the workbook, where mistakes cost nothing and teach you the most. Keep up with it and you walk into every assessment ready.</p>
         </section>
         <section class="syllabus-section">
           <h3 class="syllabus-section-title">Workbook Check Rubric</h3>
@@ -654,7 +661,11 @@
 
   function select(course, updateHash) {
     if (!panels[course]) course = 't4sg';
-    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.course === course)));
+    tabs.forEach(t => {
+      const active = t.dataset.course === course;
+      t.setAttribute('aria-selected', String(active));
+      t.tabIndex = active ? 0 : -1;
+    });
     Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== course; });
     // The title names the saved PDF after the open course.
     document.title = "Ramsey's Syllabi · " + COURSE_NAMES[course];
@@ -662,6 +673,19 @@
   }
 
   tabs.forEach(t => t.addEventListener('click', () => select(t.dataset.course, true)));
+  tabs.forEach((tab, index) => tab.addEventListener('keydown', event => {
+    const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (!keys.includes(event.key)) return;
+    event.preventDefault();
+    const nextIndex = event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? tabs.length - 1
+        : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    const nextTab = tabs[nextIndex];
+    select(nextTab.dataset.course, true);
+    nextTab.focus();
+  }));
   window.addEventListener('hashchange', () => select(location.hash.slice(1) || 't4sg', false));
   select(location.hash.slice(1) || 't4sg', false);
 </script>
