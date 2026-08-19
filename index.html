@@ -562,6 +562,7 @@
   // handed over yet (omit it when a syllabus is complete).
   const COURSE_CONTENT = {
     chemistry: {
+      hub: { url: 'https://inquiry.sparklearningstudio.ai/chemistry', display: 'inquiry.sparklearningstudio.ai/chemistry' },
       lede: `
         <section class="syllabus-section syllabus-lead">
           <h3 class="syllabus-section-title">Course Description</h3>
@@ -604,6 +605,11 @@
     document.getElementById('panel-' + course).innerHTML = `
       <h2 class="course-name">${COURSE_NAMES[course]}<span class="course-block">Block TBD</span></h2>
       ${INSTRUCTOR_BAND}
+      ${c.hub ? `
+      <a class="syllabus-hub-link" href="${c.hub.url}" target="_blank" rel="noopener">
+        <span class="shl-label">Class Digital Workbook</span>
+        <span class="shl-url">${c.hub.display} ↗</span>
+      </a>` : ''}
       ${c.lede || ''}
       <div class="syllabus-grid">
         ${c.sections || ''}
