@@ -326,6 +326,38 @@
   }
   .syllabus-rows dd a:hover { border-bottom-color: var(--accent); }
 
+  /* Prominent class-hub link band (T4SG's digital workbook) — sits right
+     under the instructor band, solid accent so it reads as the front door. */
+  .syllabus-hub-link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+    margin: -12px 0 26px;
+    padding: 13px 18px;
+    background: var(--accent);
+    border-radius: 12px;
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .syllabus-hub-link:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+  .syllabus-hub-link .shl-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  .syllabus-hub-link .shl-url {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
   .section-note {
     margin-top: 12px !important;
     font-size: 13px !important;
@@ -365,6 +397,12 @@
     .site-title { font-size: 22px; }
     main { padding: 18px 0 0; }
     .course-name { font-size: 20px; }
+    .syllabus-hub-link {
+      background: none;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      padding: 9px 14px;
+    }
     .syllabus-grid { columns: 2; column-gap: 12px; margin-top: 14px; }
     .syllabus-grid .syllabus-section {
       box-shadow: none;
@@ -414,6 +452,11 @@
           <span>Office hours: every Coyote Block, Room B220</span>
         </span>
       </div>
+
+      <a class="syllabus-hub-link" href="https://t4sg-at-sa.vercel.app" target="_blank" rel="noopener">
+        <span class="shl-label">Class Digital Workbook</span>
+        <span class="shl-url">t4sg-at-sa.vercel.app ↗</span>
+      </a>
 
       <section class="syllabus-section syllabus-lead">
         <h3 class="syllabus-section-title">Course Description</h3>
@@ -513,18 +556,63 @@
       <p>Phone use, attendance, and all other student policies follow the <a href="https://drive.google.com/file/d/1q5lIpmiZsv2W1Dd-c_st8j67pABHQHS3/view" target="_blank" rel="noopener">Student Handbook ↗</a>. For attendance specifics, see the <a href="https://docs.google.com/document/d/1bWm1EaeeQiqTXq6UFJuw_zyMqL5GR9oI32ZScgMJ5MI/edit?usp=sharing" target="_blank" rel="noopener">attendance policy ↗</a>.</p>
     </section>`;
 
-  // Courses whose specific sections haven't been handed over yet: shared
-  // sections now, a quiet placeholder card for the rest.
+  // Course-specific content, slotted into the one shared template below.
+  // `lede` renders above the grid, `sections` render before the shared
+  // AI Policy / School Policies cards, `pending` names what Ramsey has not
+  // handed over yet (omit it when a syllabus is complete).
+  const COURSE_CONTENT = {
+    chemistry: {
+      lede: `
+        <section class="syllabus-section syllabus-lead">
+          <h3 class="syllabus-section-title">Course Description</h3>
+          <p>The purpose of Chemistry is to give students a strong foundation in the study of matter while emphasizing inquiry, exploration, and critical thinking. The course follows an <strong>inquiry-driven learning cycle</strong> in which students make predictions about phenomena, test those predictions through labs and investigations, and build explanatory models before formal instruction. This design both prepares students for a first semester of college-level chemistry and provides the foundation needed for future study in advanced courses such as AP Chemistry and Biochemistry.</p>
+        </section>`,
+      sections: `
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">Course Outline</h3>
+          <ul class="syllabus-list">
+            <li><strong>Atomic Structure</strong></li>
+            <li><strong>Electron Structure</strong></li>
+            <li><strong>Bonding</strong></li>
+            <li><strong>States of Matter</strong> and intermolecular forces</li>
+            <li><strong>Chemical Reactions</strong>, qualitative and quantitative</li>
+          </ul>
+        </section>
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">Required Materials</h3>
+          <ul class="syllabus-list">
+            <li>Laptop with reliable internet access</li>
+            <li>Writing utensils</li>
+            <li>Workbook and all other materials provided by the teacher</li>
+          </ul>
+        </section>
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">Class Guidelines</h3>
+          <dl class="syllabus-rows">
+            <div><dt>Late work</dt><dd>10% off, with a Friday 4:00 PM cutoff.</dd></div>
+            <div><dt>Revisions</dt><dd>Revise submitted work for up to 50% of the credit back.</dd></div>
+          </dl>
+        </section>`,
+      pending: 'grading overview, make-up work, and reassessments'
+    }
+  };
+  const DEFAULT_PENDING = 'course description, course outline, required materials, grading overview, and class guidelines (late work, make-up work, reassessments, accommodations, college visits)';
+
   ['chemistry', 'biochem', 'neuro'].forEach(course => {
+    const c = COURSE_CONTENT[course] || {};
+    const pending = 'pending' in c ? c.pending : DEFAULT_PENDING;
     document.getElementById('panel-' + course).innerHTML = `
       <h2 class="course-name">${COURSE_NAMES[course]}<span class="course-block">Block TBD</span></h2>
       ${INSTRUCTOR_BAND}
+      ${c.lede || ''}
       <div class="syllabus-grid">
+        ${c.sections || ''}
         ${SHARED_SECTIONS}
+        ${pending ? `
         <section class="syllabus-section placeholder-section">
-          <h3 class="syllabus-section-title">Full Syllabus</h3>
-          <p>Coming soon: course description, course outline, required materials, grading overview, and class guidelines (late work, make-up work, reassessments, accommodations, college visits).</p>
-        </section>
+          <h3 class="syllabus-section-title">${c.sections ? 'Still to Come' : 'Full Syllabus'}</h3>
+          <p>Coming soon: ${pending}.</p>
+        </section>` : ''}
       </div>`;
   });
 
