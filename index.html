@@ -541,23 +541,78 @@
     padding: 2px 9px;
   }
   .qa-q { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--paper-ink); }
-  .qa-answer {
-    margin-top: 12px;
-    padding: 12px 14px;
-    background: var(--accent-soft);
-    border-left: 3px solid var(--accent);
+  /* Thread: every reply after the opening question, teacher or student. */
+  .qa-thread { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .qa-reply {
+    padding: 11px 14px;
+    background: var(--bg-2);
+    border-left: 3px solid var(--border-strong);
     border-radius: 0 10px 10px 0;
   }
-  .qa-answer-by {
+  .qa-reply.is-teacher {
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+  }
+  .qa-reply-by {
     display: block;
     font-size: 10.5px;
     font-weight: 700;
     letter-spacing: 1.4px;
     text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 4px;
+    color: var(--ink-low);
+    margin-bottom: 3px;
   }
-  .qa-answer p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--paper-ink); }
+  .qa-reply.is-teacher .qa-reply-by { color: var(--accent); }
+  .qa-reply p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--paper-ink); }
+
+  /* Inline reply composer under a question */
+  .qa-replybar { margin-top: 12px; }
+  .qa-replybtn {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  .qa-replybtn:hover { text-decoration: underline; }
+  .qa-replyform { display: none; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .qa-replyform.is-open { display: flex; }
+  .qa-replyform select {
+    flex: 0 0 auto;
+    width: 150px;
+    font: inherit;
+    font-size: 13.5px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    background: var(--bg-1);
+  }
+  .qa-replyform textarea {
+    flex: 1 1 200px;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 8px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    resize: vertical;
+    min-height: 38px;
+  }
+  .qa-replyform button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+  .qa-replyform button:disabled { opacity: 0.4; cursor: not-allowed; }
   .qa-empty {
     padding: 26px 18px;
     text-align: center;
@@ -888,7 +943,7 @@
   // First names only, per Ramsey. No collisions inside a course, so a first
   // name is unambiguous. Students not listed can add themselves.
   const ROSTERS = {
-    t4sg: ['Aurora','Carina','Carter','Dana','Elijah','Franchesca','Gabe','Henry','Iris','Isabella','Katie','Oona','Peter','Riley','Weston'],
+    t4sg: ['Aurora','Carina','Carter','Dana','Elijah','Franchesca','Gabe','Henry','Isabella','Katie','Oona','Peter','Riley','Weston'],
     chemistry: ['Ailani','Alice','Amaeya','Archie','Asher','Benjamin','Benny','Camila','Carter','Cezzie','Charlie','Cleo','Cole','Dahlia','Elijah','Evelyn','Fabian','Gigi','Hayden','Hazel','Jack','Jaqui','Kai','Keller','Khloe','Lluvia','Logan','Maddox','Margaret','Milan','Nathan','Noa','Parker','Preston','Reed','Remy','Ryan','Ryken','Sabine','Simone','Stella','Theodore'],
     biochem: [],
     neuro: []
@@ -1013,7 +1068,8 @@
       try {
         await addDoc(collection(db, 'questions'), {
           course, name: name.slice(0, 40), text: body.slice(0, 1000),
-          createdAt: serverTimestamp(), answer: '', answeredAt: null, hidden: false
+          createdAt: serverTimestamp(), answer: '', answeredAt: null,
+          hidden: false, replies: []
         });
         if (sel.value === '__other') { await rememberName(course, name); }
         text.value = '';
@@ -1040,35 +1096,87 @@
           list.innerHTML = `<div class="qa-empty">No questions yet. Ask the first one.</div>`;
           return;
         }
-        list.innerHTML = visible.map(i => `
+        const rosterOpts = rosterFor(course).map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+        list.innerHTML = visible.map(i => {
+          // Older posts used a single `answer` field; show it as the first
+          // reply so nothing written before threading disappears.
+          const thread = [
+            ...(i.answer ? [{ by: TEACHER, role: 'teacher', text: i.answer }] : []),
+            ...(Array.isArray(i.replies) ? i.replies : [])
+          ];
+          return `
           <article class="qa-item${i.hidden ? ' is-hidden' : ''}" data-id="${i.id}">
             <div class="qa-meta">
               <span class="qa-name">${esc(i.name)}</span>
               <span class="qa-time">${esc(timeAgo(i.createdAt))}</span>
-              ${i.answer ? '' : '<span class="qa-pending">Awaiting answer</span>'}
+              ${thread.some(r => r.role === 'teacher') ? '' : '<span class="qa-pending">Awaiting answer</span>'}
               ${i.hidden ? '<span class="qa-pending">Hidden</span>' : ''}
             </div>
             <p class="qa-q">${esc(i.text)}</p>
-            ${i.answer ? `<div class="qa-answer"><span class="qa-answer-by">${esc(TEACHER)}</span><p>${esc(i.answer)}</p></div>` : ''}
+            ${thread.length ? `<div class="qa-thread">${thread.map(r => `
+              <div class="qa-reply${r.role === 'teacher' ? ' is-teacher' : ''}">
+                <span class="qa-reply-by">${esc(r.by)}</span>
+                <p>${esc(r.text)}</p>
+              </div>`).join('')}</div>` : ''}
+            <div class="qa-replybar">
+              <button class="qa-replybtn" data-open-reply type="button">Reply</button>
+              <div class="qa-replyform" data-replyform>
+                ${IS_ADMIN ? '' : `<select data-r-name aria-label="Your name">
+                  <option value="">Your name...</option>${rosterOpts}
+                </select>`}
+                <textarea data-r-text rows="1" maxlength="2000" placeholder="${IS_ADMIN ? 'Your answer...' : 'Add to this thread...'}" aria-label="Your reply"></textarea>
+                <button data-r-send type="button" disabled>${IS_ADMIN ? 'Answer' : 'Reply'}</button>
+              </div>
+            </div>
             <div class="qa-admin">
-              <textarea data-reply rows="1" placeholder="Answer...">${esc(i.answer || '')}</textarea>
-              <button class="primary" data-save type="button">Save answer</button>
               <button data-hide type="button">${i.hidden ? 'Unhide' : 'Hide'}</button>
               <button data-del type="button">Delete</button>
             </div>
-          </article>`).join('');
+          </article>`;
+        }).join('');
 
-        if (!IS_ADMIN) return;
         list.querySelectorAll('.qa-item').forEach(el => {
           const id = el.dataset.id;
           const ref = doc(db, 'questions', id);
-          el.querySelector('[data-save]').addEventListener('click', async () => {
-            const val = el.querySelector('[data-reply]').value.trim();
-            await updateDoc(ref, { answer: val.slice(0, 2000), answeredAt: serverTimestamp() });
+          const item = visible.find(v => v.id === id);
+          const form = el.querySelector('[data-replyform]');
+          const rName = el.querySelector('[data-r-name]');
+          const rText = el.querySelector('[data-r-text]');
+          const rSend = el.querySelector('[data-r-send]');
+
+          const replyName = () => IS_ADMIN ? TEACHER : (rName ? rName.value : '');
+          const syncReply = () => { rSend.disabled = !(replyName() && rText.value.trim()); };
+          el.querySelector('[data-open-reply]').addEventListener('click', () => {
+            form.classList.toggle('is-open');
+            if (form.classList.contains('is-open')) rText.focus();
           });
+          if (rName) rName.addEventListener('change', syncReply);
+          rText.addEventListener('input', syncReply);
+
+          rSend.addEventListener('click', async () => {
+            const by = replyName();
+            const body = rText.value.trim();
+            if (!by || !body) return;
+            if (isBlocked(body)) { rText.value = ''; alert("Let's rephrase that one and try again."); return; }
+            rSend.disabled = true;
+            const next = [
+              ...(Array.isArray(item.replies) ? item.replies : []),
+              { by: by.slice(0, 40), role: IS_ADMIN ? 'teacher' : 'student', text: body.slice(0, 2000), at: new Date().toISOString() }
+            ].slice(-50);
+            try {
+              await updateDoc(ref, { replies: next, answeredAt: serverTimestamp() });
+              rText.value = '';
+              form.classList.remove('is-open');
+            } catch (err) {
+              console.error(err);
+              alert('That reply did not send. Try again.');
+              rSend.disabled = false;
+            }
+          });
+
+          if (!IS_ADMIN) return;
           el.querySelector('[data-hide]').addEventListener('click', async () => {
-            const cur = visible.find(v => v.id === id);
-            await updateDoc(ref, { hidden: !cur.hidden });
+            await updateDoc(ref, { hidden: !item.hidden });
           });
           el.querySelector('[data-del]').addEventListener('click', async () => {
             if (confirm('Delete this question permanently?')) await deleteDoc(ref);

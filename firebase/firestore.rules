@@ -10,7 +10,7 @@ service cloud.firestore {
 
       allow create: if
         request.resource.data.keys().hasOnly(
-          ['course', 'name', 'text', 'createdAt', 'answer', 'answeredAt', 'hidden']
+          ['course', 'name', 'text', 'createdAt', 'answer', 'answeredAt', 'hidden', 'replies']
         )
         && request.resource.data.course is string
         && request.resource.data.course.size() > 0
@@ -22,15 +22,18 @@ service cloud.firestore {
         && request.resource.data.text.size() > 0
         && request.resource.data.text.size() <= 1000
         && request.resource.data.answer == ''
-        && request.resource.data.hidden == false;
+        && request.resource.data.hidden == false
+        && request.resource.data.replies.size() == 0;
 
-      // Teacher answers and hides from the admin view. Course, name, text, and
-      // the original timestamp can never be rewritten.
+      // Replies build a thread; hiding is the teacher's moderation control.
+      // Course, name, original text, and the original timestamp can never be
+      // rewritten, so a thread cannot be used to rewrite history.
       allow update: if
         request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['answer', 'answeredAt', 'hidden'])
+          .hasOnly(['answer', 'answeredAt', 'hidden', 'replies'])
         && request.resource.data.answer is string
-        && request.resource.data.answer.size() <= 2000;
+        && request.resource.data.answer.size() <= 2000
+        && request.resource.data.replies.size() <= 50;
 
       allow delete: if true;
     }
