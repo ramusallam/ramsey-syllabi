@@ -1063,6 +1063,24 @@
     return [...new Set([...(ROSTERS[course] || []), ...(extraNames[course] || [])])].sort();
   }
 
+  // A student picks their name once and their browser remembers it, so every
+  // later question and reply is one less step.
+  const NAME_KEY = (course) => `syllabi-name-${course}`;
+  function savedName(course) {
+    try { return localStorage.getItem(NAME_KEY(course)) || ''; } catch (_) { return ''; }
+  }
+  function saveName(course, n) {
+    try { if (n && n !== '__other') localStorage.setItem(NAME_KEY(course), n); } catch (_) {}
+  }
+  // Options for any name picker: the teacher first, then the roster, plus the
+  // remembered name if it is not already in the list.
+  function nameOptions(course, selected) {
+    const names = rosterFor(course);
+    if (selected && selected !== TEACHER && !names.includes(selected)) names.unshift(selected);
+    return `<option value="${esc(TEACHER)}"${selected === TEACHER ? ' selected' : ''}>${esc(TEACHER)} (teacher)</option>`
+      + names.map(n => `<option value="${esc(n)}"${n === selected ? ' selected' : ''}>${esc(n)}</option>`).join('');
+  }
+
   const qaUnsub = {};
 
   async function mountQA(course) {
@@ -1093,7 +1111,7 @@
           <div class="qa-row">
             <select class="qa-select" data-qa-name aria-label="Your name">
               <option value="">Your name...</option>
-              ${rosterFor(course).map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('')}
+              ${nameOptions(course, savedName(course))}
               <option value="__other">My name isn't listed</option>
             </select>
             <input class="qa-newname" data-qa-newname type="text" placeholder="Your first name" maxlength="40" hidden aria-label="Type your first name" />
@@ -1134,7 +1152,8 @@
       newName.hidden = !other;
       post.disabled = !(chosenName() && text.value.trim());
     }
-    sel.addEventListener('change', () => { sync(); if (sel.value === '__other') newName.focus(); });
+    sync();
+    sel.addEventListener('change', () => { sync(); saveName(course, sel.value); if (sel.value === '__other') newName.focus(); });
     newName.addEventListener('input', sync);
     text.addEventListener('input', sync);
 
@@ -1157,6 +1176,7 @@
           hidden: false, replies: []
         });
         if (sel.value === '__other') { await rememberName(course, name); }
+        saveName(course, name);
         text.value = '';
         note.textContent = 'Posted. Thanks for asking.';
         setTimeout(() => { if (note.textContent === 'Posted. Thanks for asking.') note.textContent = ''; }, 4000);
@@ -1184,7 +1204,45 @@
           list.innerHTML = `<div class="qa-empty">No questions yet. Ask the first one.</div>`;
           return;
         }
-        const rosterOpts = rosterFor(course).map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+        const rosterOpts = nameOptions(course, savedName(course));
+
+        // A live snapshot must never move the page under someone who is
+        // reading or typing. Capture what is open, what is typed, where the
+        // caret is, and which item is anchored on screen.
+        const prior = { open: {}, focus: null };
+        list.querySelectorAll('.qa-item').forEach(el => {
+          const id = el.dataset.id;
+          const f = el.querySelector('[data-replyform]');
+          if (!f) return;
+          const ta = f.querySelector('[data-r-text]');
+          const sName = f.querySelector('[data-r-name]');
+          const sNew = f.querySelector('[data-r-newname]');
+          if (f.classList.contains('is-open') || (ta && ta.value)) {
+            prior.open[id] = {
+              text: ta ? ta.value : '',
+              name: sName ? sName.value : '',
+              newName: sNew ? sNew.value : ''
+            };
+          }
+        });
+        const active = document.activeElement;
+        const activeItem = active && active.closest ? active.closest('.qa-item') : null;
+        if (activeItem && list.contains(activeItem)) {
+          prior.focus = {
+            id: activeItem.dataset.id,
+            field: active.dataset.rText !== undefined ? 'text'
+                 : active.dataset.rName !== undefined ? 'name'
+                 : active.dataset.rNewname !== undefined ? 'newname' : null,
+            start: active.selectionStart, end: active.selectionEnd
+          };
+        }
+        // Anchor on the topmost item that is still on screen.
+        let anchorId = null, anchorTop = 0;
+        for (const el of list.querySelectorAll('.qa-item')) {
+          const t = el.getBoundingClientRect().top;
+          if (t > -40) { anchorId = el.dataset.id; anchorTop = t; break; }
+        }
+
         list.innerHTML = visible.map(i => {
           // Older posts used a single `answer` field; show it as the first
           // reply so nothing written before threading disappears.
@@ -1254,6 +1312,7 @@
           });
           if (rName) rName.addEventListener('change', () => {
             syncReply();
+            saveName(course, rName.value);
             if (rName.value === '__other') rNewName.focus();
           });
           if (rNewName) rNewName.addEventListener('input', syncReply);
@@ -1279,7 +1338,7 @@
             rNote.textContent = 'Sending...';
             const reply = {
               by: by.slice(0, 40),
-              role: isAdmin ? 'teacher' : 'student',
+              role: (isAdmin || by === TEACHER) ? 'teacher' : 'student',
               text: body.slice(0, 2000),
               at: new Date().toISOString()
             };
@@ -1308,6 +1367,43 @@
             if (confirm('Delete this question permanently?')) await deleteDoc(ref);
           });
         });
+
+        // Put everything back exactly as it was.
+        Object.entries(prior.open).forEach(([id, st]) => {
+          const el = list.querySelector(`.qa-item[data-id="${id}"]`);
+          if (!el) return;
+          const f = el.querySelector('[data-replyform]');
+          const btn = el.querySelector('[data-open-reply]');
+          const ta = f.querySelector('[data-r-text]');
+          const sName = f.querySelector('[data-r-name]');
+          const sNew = f.querySelector('[data-r-newname]');
+          f.classList.add('is-open');
+          if (btn) btn.setAttribute('aria-expanded', 'true');
+          if (ta) ta.value = st.text;
+          if (sName && st.name) sName.value = st.name;
+          if (sNew) { sNew.value = st.newName; sNew.hidden = sName?.value !== '__other'; }
+          const send = f.querySelector('[data-r-send]');
+          const who = isAdmin ? TEACHER : (sName?.value === '__other' ? (sNew?.value || '').trim() : (sName?.value || ''));
+          if (send) send.disabled = !(who && (ta?.value || '').trim());
+        });
+        if (prior.focus && prior.focus.field) {
+          const el = list.querySelector(`.qa-item[data-id="${prior.focus.id}"]`);
+          const sel = { text: '[data-r-text]', name: '[data-r-name]', newname: '[data-r-newname]' }[prior.focus.field];
+          const field = el && el.querySelector(sel);
+          if (field) {
+            field.focus({ preventScroll: true });
+            if (field.setSelectionRange && prior.focus.start != null) {
+              try { field.setSelectionRange(prior.focus.start, prior.focus.end); } catch (_) {}
+            }
+          }
+        }
+        if (anchorId) {
+          const el = list.querySelector(`.qa-item[data-id="${anchorId}"]`);
+          if (el) {
+            const delta = el.getBoundingClientRect().top - anchorTop;
+            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'instant' });
+          }
+        }
       },
       (err) => {
         console.error('qa subscribe', err);
