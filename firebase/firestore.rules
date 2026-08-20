@@ -1,49 +1,107 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'ramsey.musallam@gmail.com',
+          'ramsey.musallam@sonomaacademy.org'
+        ];
+    }
 
-    // Syllabus Q&A. No login: the roster name picker provides accountability,
-    // matching the T4SG hub's model. Rules constrain shape and size so a
-    // scripted client cannot dump junk or overwrite an answer.
+    function validCourse(course) {
+      return course in ['t4sg', 'chemistry', 'biochem', 'neuro'];
+    }
+
+    function validName(name) {
+      return name is string
+        && name.size() > 0
+        && name.size() <= 40;
+    }
+
+    function validStudentReply(reply) {
+      return reply is map
+        && reply.keys().hasOnly(['by', 'role', 'text', 'at'])
+        && validName(reply.by)
+        && reply.role == 'student'
+        && reply.text is string
+        && reply.text.size() > 0
+        && reply.text.size() <= 2000
+        && reply.at is string
+        && reply.at.size() <= 40;
+    }
+
+    function appendsOneStudentReply() {
+      let oldReplies = resource.data.get('replies', []);
+      let newReplies = request.resource.data.get('replies', []);
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['replies'])
+        && oldReplies is list
+        && newReplies is list
+        && newReplies.size() == oldReplies.size() + 1
+        && newReplies.size() <= 50
+        && newReplies.hasAll(oldReplies)
+        && validStudentReply(newReplies[oldReplies.size()]);
+    }
+
     match /questions/{questionId} {
-      allow read: if true;
+      allow read: if resource.data.hidden == false || isAdmin();
 
       allow create: if
-        request.resource.data.keys().hasOnly(
-          ['course', 'name', 'text', 'createdAt', 'answer', 'answeredAt', 'hidden', 'replies']
-        )
-        && request.resource.data.course is string
-        && request.resource.data.course.size() > 0
-        && request.resource.data.course.size() <= 40
-        && request.resource.data.name is string
-        && request.resource.data.name.size() > 0
-        && request.resource.data.name.size() <= 40
+        request.resource.data.keys().hasOnly([
+          'course', 'name', 'text', 'createdAt', 'answer',
+          'answeredAt', 'hidden', 'replies'
+        ])
+        && validCourse(request.resource.data.course)
+        && validName(request.resource.data.name)
         && request.resource.data.text is string
         && request.resource.data.text.size() > 0
         && request.resource.data.text.size() <= 1000
+        && request.resource.data.createdAt == request.time
         && request.resource.data.answer == ''
+        && request.resource.data.answeredAt == null
         && request.resource.data.hidden == false
+        && request.resource.data.replies is list
         && request.resource.data.replies.size() == 0;
 
-      // Replies build a thread; hiding is the teacher's moderation control.
-      // Course, name, original text, and the original timestamp can never be
-      // rewritten, so a thread cannot be used to rewrite history.
-      allow update: if
-        request.resource.data.diff(resource.data).affectedKeys()
+      // Students may only append one validated student reply. They cannot
+      // rewrite prior replies, impersonate the teacher, hide, or delete.
+      allow update: if appendsOneStudentReply();
+
+      // Teacher moderation is protected by verified Firebase Authentication.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['answer', 'answeredAt', 'hidden', 'replies'])
         && request.resource.data.answer is string
         && request.resource.data.answer.size() <= 2000
-        && request.resource.data.replies.size() <= 50;
+        && request.resource.data.hidden is bool
+        && request.resource.data.get('replies', []) is list
+        && request.resource.data.get('replies', []).size() <= 50;
 
-      allow delete: if true;
+      allow delete: if isAdmin();
     }
 
-    // Per-course roster additions from "My name isn't listed".
     match /rosters/{course} {
-      allow read: if true;
-      allow write: if
-        request.resource.data.keys().hasOnly(['names'])
-        && request.resource.data.names.size() <= 200;
+      allow read: if validCourse(course);
+
+      allow create: if validCourse(course)
+        && request.resource.data.keys().hasOnly(['names'])
+        && request.resource.data.names is list
+        && request.resource.data.names.size() == 1
+        && validName(request.resource.data.names[0]);
+
+      allow update: if isAdmin() || (
+        validCourse(course)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['names'])
+        && resource.data.names is list
+        && request.resource.data.names is list
+        && request.resource.data.names.size() == resource.data.names.size() + 1
+        && request.resource.data.names.size() <= 200
+        && request.resource.data.names[0:resource.data.names.size()] == resource.data.names
+        && validName(request.resource.data.names[resource.data.names.size()])
+      );
+
+      allow delete: if isAdmin();
     }
 
     match /{document=**} {

@@ -471,6 +471,7 @@
     border-radius: 10px;
     background: var(--bg-1);
     color: var(--ink-hi);
+    min-height: 44px;
   }
   .qa-text {
     flex: 1 1 240px;
@@ -486,7 +487,6 @@
     resize: vertical;
   }
   .qa-select:focus, .qa-text:focus, .qa-newname:focus {
-    outline: none;
     border-color: var(--accent);
   }
   .qa-post {
@@ -500,12 +500,14 @@
     background: var(--accent);
     color: #fff;
     cursor: pointer;
+    min-height: 44px;
     transition: background 0.15s ease, transform 0.15s ease;
   }
   .qa-post:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
   .qa-post:disabled { opacity: 0.4; cursor: not-allowed; }
   .qa-note {
     margin: 10px 0 0;
+    min-height: 20px;
     font-size: 13px;
     color: var(--ink-low);
   }
@@ -540,7 +542,7 @@
     border-radius: 999px;
     padding: 2px 9px;
   }
-  .qa-q { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--paper-ink); }
+  .qa-q { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--paper-ink); overflow-wrap: anywhere; }
   /* Thread: every reply after the opening question, teacher or student. */
   .qa-thread { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
   .qa-reply {
@@ -563,7 +565,7 @@
     margin-bottom: 3px;
   }
   .qa-reply.is-teacher .qa-reply-by { color: var(--accent); }
-  .qa-reply p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--paper-ink); }
+  .qa-reply p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--paper-ink); overflow-wrap: anywhere; }
 
   /* Inline reply composer under a question */
   .qa-replybar { margin-top: 12px; }
@@ -574,13 +576,14 @@
     color: var(--accent);
     background: none;
     border: none;
-    padding: 0;
+    min-height: 44px;
+    padding: 8px 0;
     cursor: pointer;
   }
   .qa-replybtn:hover { text-decoration: underline; }
   .qa-replyform { display: none; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
   .qa-replyform.is-open { display: flex; }
-  .qa-replyform select {
+  .qa-replyform select, .qa-replyform input {
     flex: 0 0 auto;
     width: 150px;
     font: inherit;
@@ -589,6 +592,8 @@
     border: 1px solid var(--border-strong);
     border-radius: 9px;
     background: var(--bg-1);
+    color: var(--ink-hi);
+    min-height: 44px;
   }
   .qa-replyform textarea {
     flex: 1 1 200px;
@@ -611,8 +616,43 @@
     background: var(--accent);
     color: #fff;
     cursor: pointer;
+    min-height: 44px;
   }
   .qa-replyform button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .qa-reply-note {
+    flex: 1 0 100%;
+    min-height: 18px;
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--ink-low);
+  }
+  .qa-reply-note.is-error { color: #b91c1c; }
+
+  .qa-admin-login {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--accent-soft);
+  }
+  .qa-admin-login p { margin: 0; font-size: 13.5px; color: var(--ink-mid); }
+  .qa-admin-login button {
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--accent);
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
   .qa-empty {
     padding: 26px 18px;
     text-align: center;
@@ -645,6 +685,7 @@
     background: var(--bg-1);
     color: var(--ink-mid);
     cursor: pointer;
+    min-height: 44px;
   }
   .qa-admin button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .qa-admin button:hover { border-color: var(--accent); }
@@ -653,6 +694,7 @@
   @media (max-width: 620px) {
     .qa-select, .qa-newname { width: 100%; }
     .qa-post { width: 100%; }
+    .qa-replyform select, .qa-replyform input, .qa-replyform textarea, .qa-replyform button { width: 100%; }
   }
 
   /* ============== Print: the open syllabus as a clean handout ============== */
@@ -796,8 +838,11 @@
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import {
     getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
-    onSnapshot, query, where, orderBy, serverTimestamp, setDoc, getDoc
+    onSnapshot, query, where, serverTimestamp, setDoc, getDoc, arrayUnion
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import {
+    getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
   // Tab switcher with shareable hashes (#chemistry opens that course).
   const tabs = Array.from(document.querySelectorAll('.tab'));
@@ -927,9 +972,8 @@
 
   /* ============== Q&A board ==============
      Students post questions per course and Ramsey answers them in public.
-     No login: the roster name picker is the accountability layer, matching
-     the T4SG hub. Firestore rules cap field sizes and forbid rewriting a
-     question's author or text. */
+     Students use the roster picker; teacher moderation requires a verified
+     Google account and is enforced again by Firestore rules. */
   const firebaseApp = initializeApp({
     apiKey: 'AIzaSyBqkLnImVX2dkQK3xk6VJIv95syK1lNq6U',
     authDomain: 'ramsey-syllabi.firebaseapp.com',
@@ -939,6 +983,9 @@
     appId: '1:752312524238:web:3d187efbfbf39baac5df9f'
   });
   const db = getFirestore(firebaseApp);
+  const auth = getAuth(firebaseApp);
+  const adminProvider = new GoogleAuthProvider();
+  adminProvider.setCustomParameters({ prompt: 'select_account' });
 
   // First names only, per Ramsey. No collisions inside a course, so a first
   // name is unambiguous. Students not listed can add themselves.
@@ -949,9 +996,13 @@
     neuro: []
   };
   const TEACHER = 'Ramsey';
-  const ADMIN_TOKEN = 'ramsey-syllabi';
-  const IS_ADMIN = new URLSearchParams(location.search).get('admin') === ADMIN_TOKEN;
-  if (IS_ADMIN) document.body.classList.add('is-admin');
+  const ADMIN_EMAILS = new Set([
+    'ramsey.musallam@gmail.com',
+    'ramsey.musallam@sonomaacademy.org'
+  ]);
+  const ADMIN_REQUESTED = new URLSearchParams(location.search).has('admin');
+  let isAdmin = false;
+  let signedInEmail = '';
 
   // Layer 2 of moderation (layer 1 is the required name, layer 3 is the
   // teacher admin view). Blocks the obvious before it ever reaches the board.
@@ -994,7 +1045,9 @@
     if (ROSTERS[course].includes(name) || list.includes(name)) return;
     list.push(name);
     extraNames[course] = list;
-    try { await setDoc(doc(db, 'rosters', course), { names: list }); } catch (_) {}
+    try {
+      await setDoc(doc(db, 'rosters', course), { names: arrayUnion(name) }, { merge: true });
+    } catch (_) {}
   }
 
   function rosterFor(course) {
@@ -1014,11 +1067,19 @@
 
     mount.innerHTML = `
       <section class="qa" id="qa-${course}">
+        ${ADMIN_REQUESTED ? `<div class="qa-admin-login">
+          <p>${isAdmin
+            ? `Teacher controls active for ${esc(signedInEmail)}.`
+            : signedInEmail
+              ? `${esc(signedInEmail)} is not authorized for teacher controls.`
+              : 'Teacher controls require your verified Google account.'}</p>
+          <button data-admin-auth type="button">${isAdmin ? 'Sign out' : 'Sign in'}</button>
+        </div>` : ''}
         <div class="qa-head">
           <h3 class="qa-title">Questions</h3>
-          <span class="qa-count" data-qa-count>0</span>
+          <span class="qa-count" data-qa-count aria-live="polite">0 questions</span>
         </div>
-        <p class="qa-sub">Ask anything about this course. Pick your name, and I will answer here so everyone can see.</p>
+        <p class="qa-sub">Ask about this course. First names and posts are public.</p>
         <div class="qa-form">
           <div class="qa-row">
             <select class="qa-select" data-qa-name aria-label="Your name">
@@ -1030,9 +1091,9 @@
             <textarea class="qa-text" data-qa-text rows="1" maxlength="1000" placeholder="What's your question?" aria-label="Your question"></textarea>
             <button class="qa-post" data-qa-post type="button" disabled>Post</button>
           </div>
-          <p class="qa-note" data-qa-note></p>
+          <p class="qa-note" data-qa-note role="status" aria-live="polite"></p>
         </div>
-        <div class="qa-list" data-qa-list></div>
+        <div class="qa-list" data-qa-list aria-live="polite"></div>
       </section>`;
 
     const sel = mount.querySelector('[data-qa-name]');
@@ -1042,6 +1103,21 @@
     const note = mount.querySelector('[data-qa-note]');
     const list = mount.querySelector('[data-qa-list]');
     const countEl = mount.querySelector('[data-qa-count]');
+    const adminAuth = mount.querySelector('[data-admin-auth]');
+
+    if (adminAuth) {
+      adminAuth.addEventListener('click', async () => {
+        adminAuth.disabled = true;
+        try {
+          if (isAdmin) await signOut(auth);
+          else await signInWithPopup(auth, adminProvider);
+        } catch (err) {
+          console.error('admin auth', err);
+          adminAuth.disabled = false;
+          adminAuth.textContent = 'Try again';
+        }
+      });
+    }
 
     const chosenName = () => sel.value === '__other' ? newName.value.trim() : sel.value;
     function sync() {
@@ -1084,14 +1160,17 @@
     });
 
     if (qaUnsub[course]) qaUnsub[course]();
+    const questionQuery = isAdmin
+      ? query(collection(db, 'questions'), where('course', '==', course))
+      : query(collection(db, 'questions'), where('course', '==', course), where('hidden', '==', false));
     qaUnsub[course] = onSnapshot(
-      query(collection(db, 'questions'), where('course', '==', course)),
+      questionQuery,
       (snap) => {
         const items = [];
         snap.forEach(d => items.push({ id: d.id, ...d.data() }));
         items.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
-        const visible = IS_ADMIN ? items : items.filter(i => !i.hidden);
-        countEl.textContent = visible.length;
+        const visible = items;
+        countEl.textContent = `${visible.length} ${visible.length === 1 ? 'question' : 'questions'}`;
         if (!visible.length) {
           list.innerHTML = `<div class="qa-empty">No questions yet. Ask the first one.</div>`;
           return;
@@ -1101,9 +1180,10 @@
           // Older posts used a single `answer` field; show it as the first
           // reply so nothing written before threading disappears.
           const thread = [
-            ...(i.answer ? [{ by: TEACHER, role: 'teacher', text: i.answer }] : []),
+            ...(i.answer ? [{ by: TEACHER, role: 'teacher', text: i.answer, at: i.answeredAt }] : []),
             ...(Array.isArray(i.replies) ? i.replies : [])
           ];
+          const replyFormId = `reply-${course}-${i.id}`;
           return `
           <article class="qa-item${i.hidden ? ' is-hidden' : ''}" data-id="${i.id}">
             <div class="qa-meta">
@@ -1115,17 +1195,20 @@
             <p class="qa-q">${esc(i.text)}</p>
             ${thread.length ? `<div class="qa-thread">${thread.map(r => `
               <div class="qa-reply${r.role === 'teacher' ? ' is-teacher' : ''}">
-                <span class="qa-reply-by">${esc(r.by)}</span>
+                <span class="qa-reply-by">${esc(r.by)}${r.at ? ` · ${esc(timeAgo(r.at))}` : ''}</span>
                 <p>${esc(r.text)}</p>
               </div>`).join('')}</div>` : ''}
             <div class="qa-replybar">
-              <button class="qa-replybtn" data-open-reply type="button">Reply</button>
-              <div class="qa-replyform" data-replyform>
-                ${IS_ADMIN ? '' : `<select data-r-name aria-label="Your name">
+              <button class="qa-replybtn" data-open-reply type="button" aria-expanded="false" aria-controls="${replyFormId}">Reply</button>
+              <div class="qa-replyform" data-replyform id="${replyFormId}">
+                ${isAdmin ? '' : `<select data-r-name aria-label="Your name">
                   <option value="">Your name...</option>${rosterOpts}
-                </select>`}
-                <textarea data-r-text rows="1" maxlength="2000" placeholder="${IS_ADMIN ? 'Your answer...' : 'Add to this thread...'}" aria-label="Your reply"></textarea>
-                <button data-r-send type="button" disabled>${IS_ADMIN ? 'Answer' : 'Reply'}</button>
+                  <option value="__other">My name isn't listed</option>
+                </select>
+                <input data-r-newname type="text" maxlength="40" placeholder="Your first name" aria-label="Type your first name" hidden />`}
+                <textarea data-r-text rows="1" maxlength="2000" placeholder="${isAdmin ? 'Your answer...' : 'Add to this thread...'}" aria-label="Your reply"></textarea>
+                <button data-r-send type="button" disabled>${isAdmin ? 'Answer' : 'Reply'}</button>
+                <p class="qa-reply-note" data-r-note role="status" aria-live="polite"></p>
               </div>
             </div>
             <div class="qa-admin">
@@ -1141,40 +1224,74 @@
           const item = visible.find(v => v.id === id);
           const form = el.querySelector('[data-replyform]');
           const rName = el.querySelector('[data-r-name]');
+          const rNewName = el.querySelector('[data-r-newname]');
           const rText = el.querySelector('[data-r-text]');
           const rSend = el.querySelector('[data-r-send]');
+          const rNote = el.querySelector('[data-r-note]');
+          const openReply = el.querySelector('[data-open-reply]');
 
-          const replyName = () => IS_ADMIN ? TEACHER : (rName ? rName.value : '');
-          const syncReply = () => { rSend.disabled = !(replyName() && rText.value.trim()); };
-          el.querySelector('[data-open-reply]').addEventListener('click', () => {
+          const replyName = () => isAdmin
+            ? TEACHER
+            : (rName?.value === '__other' ? rNewName.value.trim() : (rName?.value || ''));
+          const syncReply = () => {
+            if (rNewName) rNewName.hidden = rName?.value !== '__other';
+            rSend.disabled = !(replyName() && rText.value.trim());
+          };
+          openReply.addEventListener('click', () => {
             form.classList.toggle('is-open');
-            if (form.classList.contains('is-open')) rText.focus();
+            const open = form.classList.contains('is-open');
+            openReply.setAttribute('aria-expanded', String(open));
+            if (open) rText.focus();
           });
-          if (rName) rName.addEventListener('change', syncReply);
+          if (rName) rName.addEventListener('change', () => {
+            syncReply();
+            if (rName.value === '__other') rNewName.focus();
+          });
+          if (rNewName) rNewName.addEventListener('input', syncReply);
           rText.addEventListener('input', syncReply);
 
           rSend.addEventListener('click', async () => {
             const by = replyName();
             const body = rText.value.trim();
             if (!by || !body) return;
-            if (isBlocked(body)) { rText.value = ''; alert("Let's rephrase that one and try again."); return; }
+            rNote.classList.remove('is-error');
+            if (isBlocked(body) || isBlocked(by)) {
+              rNote.textContent = "Let's rephrase that one and try again.";
+              rNote.classList.add('is-error');
+              return;
+            }
+            const replies = Array.isArray(item.replies) ? item.replies : [];
+            if (replies.length >= 50) {
+              rNote.textContent = 'This thread is full. Start a new question.';
+              rNote.classList.add('is-error');
+              return;
+            }
             rSend.disabled = true;
-            const next = [
-              ...(Array.isArray(item.replies) ? item.replies : []),
-              { by: by.slice(0, 40), role: IS_ADMIN ? 'teacher' : 'student', text: body.slice(0, 2000), at: new Date().toISOString() }
-            ].slice(-50);
+            rNote.textContent = 'Sending...';
+            const reply = {
+              by: by.slice(0, 40),
+              role: isAdmin ? 'teacher' : 'student',
+              text: body.slice(0, 2000),
+              at: new Date().toISOString()
+            };
             try {
-              await updateDoc(ref, { replies: next, answeredAt: serverTimestamp() });
+              await updateDoc(ref, isAdmin
+                ? { replies: arrayUnion(reply), answeredAt: serverTimestamp() }
+                : { replies: arrayUnion(reply) });
+              if (!isAdmin && rName?.value === '__other') await rememberName(course, by);
               rText.value = '';
+              rNote.textContent = '';
               form.classList.remove('is-open');
+              openReply.setAttribute('aria-expanded', 'false');
             } catch (err) {
               console.error(err);
-              alert('That reply did not send. Try again.');
+              rNote.textContent = 'That reply did not send. Try again.';
+              rNote.classList.add('is-error');
               rSend.disabled = false;
             }
           });
 
-          if (!IS_ADMIN) return;
+          if (!isAdmin) return;
           el.querySelector('[data-hide]').addEventListener('click', async () => {
             await updateDoc(ref, { hidden: !item.hidden });
           });
@@ -1188,6 +1305,35 @@
         list.innerHTML = `<div class="qa-empty">Questions could not load. Refresh to try again.</div>`;
       }
     );
+  }
+
+  function remountActiveQA() {
+    Object.entries(panels).forEach(([course, panel]) => {
+      if (qaUnsub[course]) {
+        qaUnsub[course]();
+        delete qaUnsub[course];
+      }
+      const mount = panel.querySelector('[data-qa]');
+      if (mount) {
+        mount.dataset.ready = '';
+        mount.innerHTML = '';
+      }
+    });
+    const active = tabs.find(tab => tab.getAttribute('aria-selected') === 'true')?.dataset.course || 't4sg';
+    mountQA(active);
+  }
+
+  if (ADMIN_REQUESTED) {
+    onAuthStateChanged(auth, user => {
+      signedInEmail = user?.email || '';
+      isAdmin = Boolean(
+        user?.emailVerified &&
+        signedInEmail &&
+        ADMIN_EMAILS.has(signedInEmail.toLowerCase())
+      );
+      document.body.classList.toggle('is-admin', isAdmin);
+      remountActiveQA();
+    });
   }
 
   function select(course, updateHash) {

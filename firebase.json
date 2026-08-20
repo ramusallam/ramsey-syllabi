@@ -1,4 +1,15 @@
 {
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Ramsey's Syllabi",
+        "supportEmail": "ramsey.musallam@gmail.com",
+        "authorizedRedirectUris": [
+          "https://ramsey-syllabi.vercel.app/__/auth/handler"
+        ]
+      }
+    }
+  },
   "firestore": {
     "rules": "firebase/firestore.rules"
   }
