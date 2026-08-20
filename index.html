@@ -408,10 +408,202 @@
   }
   .placeholder-section p { color: var(--ink-mid); }
 
+  /* ============== Q&A board ============== */
+  .qa {
+    margin-top: 34px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+  }
+  .qa-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .qa-title {
+    margin: 0;
+    font-family: "Roboto Serif", Georgia, serif;
+    font-size: clamp(20px, 2.2vw, 25px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink-hi);
+  }
+  .qa-count {
+    font-family: "Roboto Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+  .qa-sub {
+    margin: 0 0 20px;
+    font-size: 14.5px;
+    color: var(--ink-mid);
+  }
+
+  /* Ask form */
+  .qa-form {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 22px;
+  }
+  .qa-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .qa-select, .qa-newname {
+    flex: 0 0 auto;
+    width: 176px;
+    font: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--bg-1);
+    color: var(--ink-hi);
+  }
+  .qa-text {
+    flex: 1 1 240px;
+    min-height: 44px;
+    font: inherit;
+    font-size: 14.5px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--bg-1);
+    color: var(--ink-hi);
+    resize: vertical;
+  }
+  .qa-select:focus, .qa-text:focus, .qa-newname:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .qa-post {
+    flex: 0 0 auto;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .qa-post:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
+  .qa-post:disabled { opacity: 0.4; cursor: not-allowed; }
+  .qa-note {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: var(--ink-low);
+  }
+  .qa-note.is-error { color: #b91c1c; }
+
+  /* Question cards */
+  .qa-list { display: flex; flex-direction: column; gap: 12px; }
+  .qa-item {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
+  }
+  .qa-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .qa-name { font-size: 14px; font-weight: 700; color: var(--ink-hi); }
+  .qa-time { font-family: "Roboto Mono", monospace; font-size: 11px; color: var(--ink-low); }
+  .qa-pending {
+    font-family: "Roboto Mono", monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: var(--ink-low);
+    border: 1px dashed var(--border-strong);
+    border-radius: 999px;
+    padding: 2px 9px;
+  }
+  .qa-q { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--paper-ink); }
+  .qa-answer {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+  }
+  .qa-answer-by {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .qa-answer p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--paper-ink); }
+  .qa-empty {
+    padding: 26px 18px;
+    text-align: center;
+    font-size: 14.5px;
+    color: var(--ink-low);
+    border: 1px dashed var(--border-strong);
+    border-radius: 14px;
+  }
+
+  /* Teacher admin (?admin=...) */
+  .qa-admin { display: none; margin-top: 12px; gap: 8px; }
+  body.is-admin .qa-admin { display: flex; flex-wrap: wrap; }
+  .qa-admin textarea {
+    flex: 1 1 220px;
+    font: inherit;
+    font-size: 14px;
+    padding: 9px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    resize: vertical;
+    min-height: 38px;
+  }
+  .qa-admin button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 9px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-1);
+    color: var(--ink-mid);
+    cursor: pointer;
+  }
+  .qa-admin button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .qa-admin button:hover { border-color: var(--accent); }
+  .qa-item.is-hidden { opacity: 0.5; }
+
+  @media (max-width: 620px) {
+    .qa-select, .qa-newname { width: 100%; }
+    .qa-post { width: 100%; }
+  }
+
   /* ============== Print: the open syllabus as a clean handout ============== */
   @media print {
     body { background: #fff; font-size: 12px; }
-    .site-eyebrow, .tabs, .pdf-btn { display: none !important; }
+    .site-eyebrow, .tabs, .pdf-btn, .qa { display: none !important; }
     header.site { padding-top: 0; }
     .site-title { font-size: 22px; }
     main { padding: 18px 0 0; }
@@ -531,6 +723,7 @@
         <p>Phone use, attendance, and all other student policies follow the <a href="https://drive.google.com/file/d/1q5lIpmiZsv2W1Dd-c_st8j67pABHQHS3/view" target="_blank" rel="noopener">Student Handbook ↗</a>. For attendance specifics, see the <a href="https://docs.google.com/document/d/1bWm1EaeeQiqTXq6UFJuw_zyMqL5GR9oI32ZScgMJ5MI/edit?usp=sharing" target="_blank" rel="noopener">attendance policy ↗</a>.</p>
       </section>
       </div>
+      <div data-qa></div>
     </section>
 
     <!-- ============== Other courses ==============
@@ -544,7 +737,13 @@
   </main>
 </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import {
+    getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+    onSnapshot, query, where, orderBy, serverTimestamp, setDoc, getDoc
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
   // Tab switcher with shareable hashes (#chemistry opens that course).
   const tabs = Array.from(document.querySelectorAll('.tab'));
   const panels = {
@@ -666,8 +865,222 @@
           <h3 class="syllabus-section-title">${c.sections ? 'Still to Come' : 'Full Syllabus'}</h3>
           <p>Coming soon: ${pending}.</p>
         </section>` : ''}
-      </div>`;
+      </div>
+      <div data-qa></div>`;
   });
+
+
+  /* ============== Q&A board ==============
+     Students post questions per course and Ramsey answers them in public.
+     No login: the roster name picker is the accountability layer, matching
+     the T4SG hub. Firestore rules cap field sizes and forbid rewriting a
+     question's author or text. */
+  const firebaseApp = initializeApp({
+    apiKey: 'AIzaSyBqkLnImVX2dkQK3xk6VJIv95syK1lNq6U',
+    authDomain: 'ramsey-syllabi.firebaseapp.com',
+    projectId: 'ramsey-syllabi',
+    storageBucket: 'ramsey-syllabi.firebasestorage.app',
+    messagingSenderId: '752312524238',
+    appId: '1:752312524238:web:3d187efbfbf39baac5df9f'
+  });
+  const db = getFirestore(firebaseApp);
+
+  // First names only, per Ramsey. No collisions inside a course, so a first
+  // name is unambiguous. Students not listed can add themselves.
+  const ROSTERS = {
+    t4sg: ['Aurora','Carina','Carter','Dana','Elijah','Franchesca','Gabe','Henry','Iris','Isabella','Katie','Oona','Peter','Riley','Weston'],
+    chemistry: ['Ailani','Alice','Amaeya','Archie','Asher','Benjamin','Benny','Camila','Carter','Cezzie','Charlie','Cleo','Cole','Dahlia','Elijah','Evelyn','Fabian','Gigi','Hayden','Hazel','Jack','Jaqui','Kai','Keller','Khloe','Lluvia','Logan','Maddox','Margaret','Milan','Nathan','Noa','Parker','Preston','Reed','Remy','Ryan','Ryken','Sabine','Simone','Stella','Theodore'],
+    biochem: [],
+    neuro: []
+  };
+  const TEACHER = 'Ramsey';
+  const ADMIN_TOKEN = 'ramsey-syllabi';
+  const IS_ADMIN = new URLSearchParams(location.search).get('admin') === ADMIN_TOKEN;
+  if (IS_ADMIN) document.body.classList.add('is-admin');
+
+  // Layer 2 of moderation (layer 1 is the required name, layer 3 is the
+  // teacher admin view). Blocks the obvious before it ever reaches the board.
+  const BLOCKED = ['fuck','shit','bitch','cunt','nigg','faggot','fag ','retard','whore','slut','dick','pussy','cock','asshole','bastard','kys','kill yourself'];
+  function isBlocked(text) {
+    const t = ' ' + String(text).toLowerCase().replace(/[^a-z\s]/g, '') + ' ';
+    return BLOCKED.some(w => t.includes(w));
+  }
+
+  function timeAgo(ts) {
+    if (!ts) return 'just now';
+    const then = ts.toMillis ? ts.toMillis() : +new Date(ts);
+    const mins = Math.floor((Date.now() - then) / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return days + 'd ago';
+    return new Date(then).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  function esc(t) {
+    return String(t == null ? '' : t)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // Extra names students added themselves, kept per course in Firestore so
+  // the option persists for everyone next time.
+  const extraNames = {};
+  async function loadExtraNames(course) {
+    try {
+      const snap = await getDoc(doc(db, 'rosters', course));
+      extraNames[course] = (snap.exists() && Array.isArray(snap.data().names)) ? snap.data().names : [];
+    } catch (_) { extraNames[course] = []; }
+  }
+  async function rememberName(course, name) {
+    const list = extraNames[course] || [];
+    if (ROSTERS[course].includes(name) || list.includes(name)) return;
+    list.push(name);
+    extraNames[course] = list;
+    try { await setDoc(doc(db, 'rosters', course), { names: list }); } catch (_) {}
+  }
+
+  function rosterFor(course) {
+    return [...new Set([...(ROSTERS[course] || []), ...(extraNames[course] || [])])].sort();
+  }
+
+  const qaUnsub = {};
+
+  async function mountQA(course) {
+    const panel = panels[course];
+    if (!panel) return;
+    const mount = panel.querySelector('[data-qa]');
+    if (!mount || mount.dataset.ready === '1') return;
+    mount.dataset.ready = '1';
+
+    await loadExtraNames(course);
+
+    mount.innerHTML = `
+      <section class="qa" id="qa-${course}">
+        <div class="qa-head">
+          <h3 class="qa-title">Questions</h3>
+          <span class="qa-count" data-qa-count>0</span>
+        </div>
+        <p class="qa-sub">Ask anything about this course. Pick your name, and I will answer here so everyone can see.</p>
+        <div class="qa-form">
+          <div class="qa-row">
+            <select class="qa-select" data-qa-name aria-label="Your name">
+              <option value="">Your name...</option>
+              ${rosterFor(course).map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('')}
+              <option value="__other">My name isn't listed</option>
+            </select>
+            <input class="qa-newname" data-qa-newname type="text" placeholder="Your first name" maxlength="40" hidden aria-label="Type your first name" />
+            <textarea class="qa-text" data-qa-text rows="1" maxlength="1000" placeholder="What's your question?" aria-label="Your question"></textarea>
+            <button class="qa-post" data-qa-post type="button" disabled>Post</button>
+          </div>
+          <p class="qa-note" data-qa-note></p>
+        </div>
+        <div class="qa-list" data-qa-list></div>
+      </section>`;
+
+    const sel = mount.querySelector('[data-qa-name]');
+    const newName = mount.querySelector('[data-qa-newname]');
+    const text = mount.querySelector('[data-qa-text]');
+    const post = mount.querySelector('[data-qa-post]');
+    const note = mount.querySelector('[data-qa-note]');
+    const list = mount.querySelector('[data-qa-list]');
+    const countEl = mount.querySelector('[data-qa-count]');
+
+    const chosenName = () => sel.value === '__other' ? newName.value.trim() : sel.value;
+    function sync() {
+      const other = sel.value === '__other';
+      newName.hidden = !other;
+      post.disabled = !(chosenName() && text.value.trim());
+    }
+    sel.addEventListener('change', () => { sync(); if (sel.value === '__other') newName.focus(); });
+    newName.addEventListener('input', sync);
+    text.addEventListener('input', sync);
+
+    post.addEventListener('click', async () => {
+      const name = chosenName();
+      const body = text.value.trim();
+      if (!name || !body) return;
+      note.classList.remove('is-error');
+      if (isBlocked(body) || isBlocked(name)) {
+        note.textContent = "Let's rephrase that one and try again.";
+        note.classList.add('is-error');
+        return;
+      }
+      post.disabled = true;
+      note.textContent = 'Posting...';
+      try {
+        await addDoc(collection(db, 'questions'), {
+          course, name: name.slice(0, 40), text: body.slice(0, 1000),
+          createdAt: serverTimestamp(), answer: '', answeredAt: null, hidden: false
+        });
+        if (sel.value === '__other') { await rememberName(course, name); }
+        text.value = '';
+        note.textContent = 'Posted. Thanks for asking.';
+        setTimeout(() => { if (note.textContent === 'Posted. Thanks for asking.') note.textContent = ''; }, 4000);
+      } catch (err) {
+        console.error(err);
+        note.textContent = 'That did not send. Check your connection and try again.';
+        note.classList.add('is-error');
+      }
+      sync();
+    });
+
+    if (qaUnsub[course]) qaUnsub[course]();
+    qaUnsub[course] = onSnapshot(
+      query(collection(db, 'questions'), where('course', '==', course)),
+      (snap) => {
+        const items = [];
+        snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+        items.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+        const visible = IS_ADMIN ? items : items.filter(i => !i.hidden);
+        countEl.textContent = visible.length;
+        if (!visible.length) {
+          list.innerHTML = `<div class="qa-empty">No questions yet. Ask the first one.</div>`;
+          return;
+        }
+        list.innerHTML = visible.map(i => `
+          <article class="qa-item${i.hidden ? ' is-hidden' : ''}" data-id="${i.id}">
+            <div class="qa-meta">
+              <span class="qa-name">${esc(i.name)}</span>
+              <span class="qa-time">${esc(timeAgo(i.createdAt))}</span>
+              ${i.answer ? '' : '<span class="qa-pending">Awaiting answer</span>'}
+              ${i.hidden ? '<span class="qa-pending">Hidden</span>' : ''}
+            </div>
+            <p class="qa-q">${esc(i.text)}</p>
+            ${i.answer ? `<div class="qa-answer"><span class="qa-answer-by">${esc(TEACHER)}</span><p>${esc(i.answer)}</p></div>` : ''}
+            <div class="qa-admin">
+              <textarea data-reply rows="1" placeholder="Answer...">${esc(i.answer || '')}</textarea>
+              <button class="primary" data-save type="button">Save answer</button>
+              <button data-hide type="button">${i.hidden ? 'Unhide' : 'Hide'}</button>
+              <button data-del type="button">Delete</button>
+            </div>
+          </article>`).join('');
+
+        if (!IS_ADMIN) return;
+        list.querySelectorAll('.qa-item').forEach(el => {
+          const id = el.dataset.id;
+          const ref = doc(db, 'questions', id);
+          el.querySelector('[data-save]').addEventListener('click', async () => {
+            const val = el.querySelector('[data-reply]').value.trim();
+            await updateDoc(ref, { answer: val.slice(0, 2000), answeredAt: serverTimestamp() });
+          });
+          el.querySelector('[data-hide]').addEventListener('click', async () => {
+            const cur = visible.find(v => v.id === id);
+            await updateDoc(ref, { hidden: !cur.hidden });
+          });
+          el.querySelector('[data-del]').addEventListener('click', async () => {
+            if (confirm('Delete this question permanently?')) await deleteDoc(ref);
+          });
+        });
+      },
+      (err) => {
+        console.error('qa subscribe', err);
+        list.innerHTML = `<div class="qa-empty">Questions could not load. Refresh to try again.</div>`;
+      }
+    );
+  }
 
   function select(course, updateHash) {
     if (!panels[course]) course = 't4sg';
@@ -679,6 +1092,7 @@
     Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== course; });
     // The title names the saved PDF after the open course.
     document.title = "Ramsey's Syllabi · " + COURSE_NAMES[course];
+    mountQA(course);
     if (updateHash) history.replaceState(null, '', course === 't4sg' ? location.pathname : '#' + course);
   }
 

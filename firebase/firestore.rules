@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Syllabus Q&A. No login: the roster name picker provides accountability,
+    // matching the T4SG hub's model. Rules constrain shape and size so a
+    // scripted client cannot dump junk or overwrite an answer.
+    match /questions/{questionId} {
+      allow read: if true;
+
+      allow create: if
+        request.resource.data.keys().hasOnly(
+          ['course', 'name', 'text', 'createdAt', 'answer', 'answeredAt', 'hidden']
+        )
+        && request.resource.data.course is string
+        && request.resource.data.course.size() > 0
+        && request.resource.data.course.size() <= 40
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.answer == ''
+        && request.resource.data.hidden == false;
+
+      // Teacher answers and hides from the admin view. Course, name, text, and
+      // the original timestamp can never be rewritten.
+      allow update: if
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['answer', 'answeredAt', 'hidden'])
+        && request.resource.data.answer is string
+        && request.resource.data.answer.size() <= 2000;
+
+      allow delete: if true;
+    }
+
+    // Per-course roster additions from "My name isn't listed".
+    match /rosters/{course} {
+      allow read: if true;
+      allow write: if
+        request.resource.data.keys().hasOnly(['names'])
+        && request.resource.data.names.size() <= 200;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
