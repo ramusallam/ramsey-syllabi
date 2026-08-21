@@ -1072,15 +1072,25 @@
     try { return localStorage.getItem(NAME_KEY(course)) || ''; } catch (_) { return ''; }
   }
   function saveName(course, n) {
-    try { if (n && n !== '__other') localStorage.setItem(NAME_KEY(course), n); } catch (_) {}
+    try {
+      if (n && n !== '__other' && (isAdmin || !isTeacherName(n))) {
+        localStorage.setItem(NAME_KEY(course), n);
+      }
+    } catch (_) {}
   }
-  // Options for any name picker: the teacher first, then the roster, plus the
-  // remembered name if it is not already in the list.
-  function nameOptions(course, selected) {
-    const names = rosterFor(course);
-    if (selected && selected !== TEACHER && !names.includes(selected)) names.unshift(selected);
-    return `<option value="${esc(TEACHER)}"${selected === TEACHER ? ' selected' : ''}>${esc(TEACHER)} (teacher)</option>`
-      + names.map(n => `<option value="${esc(n)}"${n === selected ? ' selected' : ''}>${esc(n)}</option>`).join('');
+  function isTeacherName(name) {
+    return String(name || '').trim().toLowerCase() === TEACHER.toLowerCase();
+  }
+  // Public pickers contain students only. The teacher option appears only in
+  // the verified admin view, so the interface never invites impersonation.
+  function nameOptions(course, selected, includeTeacher = false) {
+    const names = rosterFor(course).filter(n => includeTeacher || !isTeacherName(n));
+    const safeSelected = !includeTeacher && isTeacherName(selected) ? '' : selected;
+    if (safeSelected && !names.includes(safeSelected)) names.unshift(safeSelected);
+    return (includeTeacher
+      ? `<option value="${esc(TEACHER)}"${safeSelected === TEACHER ? ' selected' : ''}>${esc(TEACHER)} (teacher)</option>`
+      : '')
+      + names.map(n => `<option value="${esc(n)}"${n === safeSelected ? ' selected' : ''}>${esc(n)}</option>`).join('');
   }
 
   const qaUnsub = {};
@@ -1113,7 +1123,7 @@
           <div class="qa-row">
             <select class="qa-select" data-qa-name aria-label="Your name">
               <option value="">Your name...</option>
-              ${nameOptions(course, savedName(course))}
+              ${nameOptions(course, isAdmin ? TEACHER : savedName(course), isAdmin)}
               <option value="__other">My name isn't listed</option>
             </select>
             <input class="qa-newname" data-qa-newname type="text" placeholder="Your first name" maxlength="40" hidden aria-label="Type your first name" />
@@ -1122,7 +1132,7 @@
           </div>
           <p class="qa-note" data-qa-note role="status" aria-live="polite"></p>
         </div>
-        <div class="qa-list" data-qa-list aria-live="polite"></div>
+        <div class="qa-list" data-qa-list></div>
       </section>`;
 
     const sel = mount.querySelector('[data-qa-name]');
@@ -1164,6 +1174,11 @@
       const body = text.value.trim();
       if (!name || !body) return;
       note.classList.remove('is-error');
+      if (!isAdmin && isTeacherName(name)) {
+        note.textContent = 'Choose your own first name.';
+        note.classList.add('is-error');
+        return;
+      }
       if (isBlocked(body) || isBlocked(name)) {
         note.textContent = "Let's rephrase that one and try again.";
         note.classList.add('is-error');
@@ -1206,7 +1221,7 @@
           list.innerHTML = `<div class="qa-empty">No questions yet. Ask the first one.</div>`;
           return;
         }
-        const rosterOpts = nameOptions(course, savedName(course));
+        const rosterOpts = nameOptions(course, savedName(course), false);
 
         // A live snapshot must never move the page under someone who is
         // reading or typing. Capture what is open, what is typed, where the
@@ -1325,6 +1340,11 @@
             const body = rText.value.trim();
             if (!by || !body) return;
             rNote.classList.remove('is-error');
+            if (!isAdmin && isTeacherName(by)) {
+              rNote.textContent = 'Choose your own first name.';
+              rNote.classList.add('is-error');
+              return;
+            }
             if (isBlocked(body) || isBlocked(by)) {
               rNote.textContent = "Let's rephrase that one and try again.";
               rNote.classList.add('is-error');
@@ -1340,21 +1360,27 @@
             rNote.textContent = 'Sending...';
             const reply = {
               by: by.slice(0, 40),
-              role: (isAdmin || by === TEACHER) ? 'teacher' : 'student',
+              role: isAdmin ? 'teacher' : 'student',
               text: body.slice(0, 2000),
               at: new Date().toISOString()
             };
+            // Close before the Firestore snapshot arrives. Otherwise the live
+            // redraw can restore the just-sent text into an open composer.
+            const draft = body;
+            rText.value = '';
+            form.classList.remove('is-open');
+            openReply.setAttribute('aria-expanded', 'false');
             try {
               await updateDoc(ref, isAdmin
                 ? { replies: arrayUnion(reply), answeredAt: serverTimestamp() }
                 : { replies: arrayUnion(reply) });
               if (!isAdmin && rName?.value === '__other') await rememberName(course, by);
-              rText.value = '';
               rNote.textContent = '';
-              form.classList.remove('is-open');
-              openReply.setAttribute('aria-expanded', 'false');
             } catch (err) {
               console.error(err);
+              rText.value = draft;
+              form.classList.add('is-open');
+              openReply.setAttribute('aria-expanded', 'true');
               rNote.textContent = 'That reply did not send. Try again.';
               rNote.classList.add('is-error');
               rSend.disabled = false;
@@ -1403,7 +1429,7 @@
           const el = list.querySelector(`.qa-item[data-id="${anchorId}"]`);
           if (el) {
             const delta = el.getBoundingClientRect().top - anchorTop;
-            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'instant' });
+            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'auto' });
           }
         }
       },

@@ -24,6 +24,7 @@ service cloud.firestore {
       return reply is map
         && reply.keys().hasOnly(['by', 'role', 'text', 'at'])
         && validName(reply.by)
+        && reply.by != 'Ramsey'
         && reply.role == 'student'
         && reply.text is string
         && reply.text.size() > 0
@@ -54,6 +55,7 @@ service cloud.firestore {
         ])
         && validCourse(request.resource.data.course)
         && validName(request.resource.data.name)
+        && (isAdmin() || request.resource.data.name != 'Ramsey')
         && request.resource.data.text is string
         && request.resource.data.text.size() > 0
         && request.resource.data.text.size() <= 1000
@@ -88,7 +90,8 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['names'])
         && request.resource.data.names is list
         && request.resource.data.names.size() == 1
-        && validName(request.resource.data.names[0]);
+        && validName(request.resource.data.names[0])
+        && request.resource.data.names[0] != 'Ramsey';
 
       allow update: if isAdmin() || (
         validCourse(course)
@@ -99,6 +102,7 @@ service cloud.firestore {
         && request.resource.data.names.size() <= 200
         && request.resource.data.names[0:resource.data.names.size()] == resource.data.names
         && validName(request.resource.data.names[resource.data.names.size()])
+        && request.resource.data.names[resource.data.names.size()] != 'Ramsey'
       );
 
       allow delete: if isAdmin();
