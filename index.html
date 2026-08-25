@@ -1001,7 +1001,7 @@
   // First names only, per Ramsey. No collisions inside a course, so a first
   // name is unambiguous. Students not listed can add themselves.
   const ROSTERS = {
-    t4sg: ['Alexa','Aurora','Carina','Carter','Dana','Dylan','Elijah','Eric','Franchesca','Gabe','Henry','Isabella','Katie','Oona','Peter','Riley','Ryan','Weston','Winter'],
+    t4sg: ['Alexa','Aurora','Carina','Carter','Dana','Dylan','Elijah','Eric','Franchesca','Gabe','Henry','Isabella','Kai','Katie','Oona','Peter','Riley','Ryan','Weston','Winter'],
     chemistry: ['Ailani','Alice','Amaeya','Archie','Asher','Benjamin','Benny','Camila','Carter','Cezzie','Charlie','Cleo','Cole','Dahlia','Elijah','Evelyn','Fabian','Gigi','Hayden','Hazel','Jack','Jaqui','Kai','Keller','Khloe','Lluvia','Logan','Maddox','Margaret','Milan','Nathan','Noa','Parker','Preston','Reed','Remy','Ryan','Ryken','Sabine','Simone','Stella','Theodore'],
     biochem: [],
     neuro: []
@@ -1053,7 +1053,8 @@
   }
   async function rememberName(course, name) {
     const list = extraNames[course] || [];
-    if (ROSTERS[course].includes(name) || list.includes(name)) return;
+    const k = String(name).trim().toLowerCase();
+    if ((ROSTERS[course] || []).some(n => n.toLowerCase() === k) || list.some(n => n.trim().toLowerCase() === k)) return;
     list.push(name);
     extraNames[course] = list;
     try {
@@ -1062,7 +1063,12 @@
   }
 
   function rosterFor(course) {
-    return [...new Set([...(ROSTERS[course] || []), ...(extraNames[course] || [])])].sort();
+    const byKey = new Map();
+    [...(ROSTERS[course] || []), ...(extraNames[course] || [])].forEach(n => {
+      const k = String(n).trim().toLowerCase();
+      if (k && !byKey.has(k)) byKey.set(k, String(n).trim());
+    });
+    return Array.from(byKey.values()).sort();
   }
 
   // A student picks their name once and their browser remembers it, so every
