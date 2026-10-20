@@ -1005,19 +1005,21 @@
 
   // Chemistry and Neuroscience share one grading system. Keep the structure
   // and common language here so the two syllabi cannot quietly drift apart.
-  function renderScienceGrading({ overview, dailyWork, workbookItems, completeExamples, effortExamples, assessmentFrequency, assessmentScope, reassessment, reassessmentNote }) {
+  function renderScienceGrading({ overview, dailyWork, otherWork, workbookItems, completeExamples, effortExamples, assessmentFrequency, assessmentScope, reassessment, reassessmentNote }) {
     return `
       <section class="syllabus-section">
         <h3 class="syllabus-section-title">Grading Overview</h3>
         <dl class="syllabus-dl">
           <div><dt>Assessments</dt><dd>80%</dd></div>
-          <div><dt>Workbook Checks</dt><dd>20%</dd></div>
+          <div><dt>Workbook Checks</dt><dd>10%</dd></div>
+          <div><dt>Homework and Presentations</dt><dd>10%</dd></div>
         </dl>
         <p class="section-note" style="margin-top:14px !important; font-size:14px !important; color:var(--ink-mid) !important;">${overview}</p>
       </section>
       <section class="syllabus-section">
         <h3 class="syllabus-section-title">How Grading Works</h3>
         <p>Daily work is where learning happens, and assessments are where it shows. ${dailyWork} all live in the workbook, where mistakes cost nothing and teach you the most. Keep up with it and you walk into every assessment ready.</p>
+        <p>A few things are graded on their own: ${otherWork}. Together they make up the last 10%.</p>
       </section>
       <section class="syllabus-section">
         <h3 class="syllabus-section-title">Workbook Check Rubric</h3>
@@ -1082,8 +1084,9 @@
         ])}
         ${renderScienceGrading({
           overview: 'Each unit has two 10-point workbook checks and one 50-point assessment. Six units across the semester.',
-          dailyWork: 'Homework, labs, simulations, and practice',
-          workbookItems: 'notes from lectures and simulations, labs, projects, presentations, practice problems, and case studies',
+          dailyWork: 'Labs, simulations, projects, and practice',
+          otherWork: 'graded homework problem sets, presentations, and the occasional in-class activity',
+          workbookItems: 'notes from lectures and simulations, labs, projects, practice problems, and case studies',
           completeExamples: 'lecture and simulation notes, labs, practice problems',
           effortExamples: 'Notes in your own words, practice problems worked, lab data recorded',
           assessmentFrequency: 'One assessment closes each unit: three per quarter, six across the semester.',
@@ -1111,6 +1114,7 @@
         ${renderScienceGrading({
           overview: 'Each unit has two 10-point workbook checks and one 50-point assessment. Three units across the eight weeks.',
           dailyWork: 'Patient cases, labs, surgical reports, simulations, and practice',
+          otherWork: 'graded homework problem sets, case presentations, and the occasional in-class activity',
           workbookItems: 'notes from lectures and simulations, patient cases, lab data, surgical reports, practice problems, and your running Addiction File',
           completeExamples: 'lecture and simulation notes, cases, labs, practice problems',
           effortExamples: 'Notes in your own words, practice problems worked, lab and surgery observations recorded',
