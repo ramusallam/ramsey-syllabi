@@ -22,7 +22,7 @@
     }
   }
   :root {
-    /* Spark Learning aesthetic — warm cream page, white cards, indigo accent.
+    /* Spark Learning aesthetic - warm cream page, white cards, indigo accent.
        Tokens mirror the T4SG hub / Studio / Companion so every surface feels
        like the same world. */
     --bg-0: #F7F3EE;
@@ -84,7 +84,7 @@
   }
   .site-title .accent { color: var(--accent); }
 
-  /* Title row: title left, PDF button right — same grammar as the Companion
+  /* Title row: title left, PDF button right - same grammar as the Companion
      hero's Save Course PDF. Stacks on phones. */
   .site-title-row {
     display: flex;
@@ -158,7 +158,7 @@
   }
   .panel[hidden] { display: none; }
 
-  /* ============== Syllabus — copied from the T4SG hub so every syllabus
+  /* ============== Syllabus - copied from the T4SG hub so every syllabus
      reads like the same printed handout: lede, instructor band, then a grid
      of quietly-titled card sections. ============== */
   .syllabus-lead { max-width: 880px; }
@@ -399,7 +399,7 @@
 
   /* Stacked rows for sentence-length values (policies, guidelines): bold
      term on its own line, plain sentence under it. The two-column .syllabus-dl
-     stays for SHORT numeric values only (grading percentages) — sentence
+     stays for SHORT numeric values only (grading percentages) - sentence
      values in that layout wrap into a ragged right column. */
   .syllabus-rows {
     margin: 0;
@@ -431,7 +431,7 @@
   }
   .syllabus-rows dd a:hover { border-bottom-color: var(--accent); }
 
-  /* Prominent class-hub link band (T4SG's digital workbook) — sits right
+  /* Prominent class-hub link band (T4SG's digital workbook) - sits right
      under the instructor band, solid accent so it reads as the front door. */
   .syllabus-hub-link {
     display: flex;
@@ -469,7 +469,7 @@
     color: var(--ink-low) !important;
   }
 
-  /* Block chip next to the course name — placeholder until blocks are set. */
+  /* Block chip next to the course name - placeholder until blocks are set. */
   .course-block {
     display: inline-block;
     margin-left: 12px;
@@ -485,7 +485,7 @@
     padding: 3px 10px;
   }
 
-  /* Placeholder card for course-specific sections not handed over yet —
+  /* Placeholder card for course-specific sections not handed over yet -
      dashed variant of the section card so it reads as "reserved". */
   .syllabus-grid .placeholder-section {
     border-style: dashed;
@@ -952,7 +952,7 @@
   };
 
   const COURSE_NAMES = { t4sg: 'Technology for Social Good (T4SG)', chemistry: 'Chemistry', biochem: 'Medical Biochemistry', neuro: 'Neuroscience' };
-  // Shared across EVERY course — instructor contact, AI use, Handbook are
+  // Shared across EVERY course - instructor contact, AI use, Handbook are
   // identical school-wide; only the course title changes. Course-specific
   // sections (projects, grading, late work, materials) arrive per course.
   const INSTRUCTOR_BAND = `
@@ -983,7 +983,7 @@
     return `
       <section class="syllabus-section learning-section">
         <div class="learning-head">
-          <h3 class="syllabus-section-title">Learning by ${courseLabel}</h3>
+          <h3 class="syllabus-section-title">Course Outline</h3>
           <p class="learning-intro">Each ${courseLabel.toLowerCase()} will name what you will be able to do, the science practice you will strengthen, and the standards it connects to.</p>
         </div>
         <div class="learning-list">
@@ -1000,6 +1000,61 @@
             </article>`;
           }).join('')}
         </div>
+      </section>`;
+  }
+
+  // Chemistry and Neuroscience share one grading system. Keep the structure
+  // and common language here so the two syllabi cannot quietly drift apart.
+  function renderScienceGrading({ overview, dailyWork, workbookItems, completeExamples, effortExamples, assessmentFrequency, assessmentScope, reassessment, reassessmentNote }) {
+    return `
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Grading Overview</h3>
+        <dl class="syllabus-dl">
+          <div><dt>Assessments</dt><dd>80%</dd></div>
+          <div><dt>Workbook Checks</dt><dd>20%</dd></div>
+        </dl>
+        <p class="section-note" style="margin-top:14px !important; font-size:14px !important; color:var(--ink-mid) !important;">${overview}</p>
+      </section>
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">How Grading Works</h3>
+        <p>Daily work is where learning happens, and assessments are where it shows. ${dailyWork} all live in the workbook, where mistakes cost nothing and teach you the most. Keep up with it and you walk into every assessment ready.</p>
+      </section>
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Workbook Check Rubric</h3>
+        <p>All of the day-to-day work lives here: ${workbookItems}. Two checks per unit, 10 points each, scored on the rubric below.</p>
+        <dl class="syllabus-rows" style="margin-top:14px;">
+          <div><dt>Complete and current - 4 pts</dt><dd>Every assigned day is there: ${completeExamples}.</dd></div>
+          <div><dt>Effort and content - 4 pts</dt><dd>${effortExamples}. Graded on effort, not accuracy.</dd></div>
+          <div><dt>Organization - 2 pts</dt><dd>Table of contents current, pages numbered, entries dated and titled.</dd></div>
+        </dl>
+        <p class="section-note">Checks are unannounced, usually one in each half of a unit. Do the day's work on the day it is assigned and you will be fine.</p>
+      </section>
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Assessments - 80%</h3>
+        <p>This is where you show what you learned in a unit, and the one place where accuracy is graded.</p>
+        <dl class="syllabus-rows" style="margin-top:14px;">
+          <div><dt>How often</dt><dd>${assessmentFrequency}</dd></div>
+          <div><dt>What is on it</dt><dd>${assessmentScope}</dd></div>
+          <div><dt>Reassessment</dt><dd>${reassessment} A hard day should not define what you know, and this is the way back.</dd></div>
+          <div><dt>How it works</dt><dd>Finish that unit's workbook and bring a short error analysis: what went wrong, the corrected work, and what you understand now.</dd></div>
+          <div><dt>The retake</dt><dd>Covers only what you missed, on a set reassessment day, and the new score stands.</dd></div>
+        </dl>
+        <p class="section-note">Reassessment works best alongside office hours and questions asked as you go. ${reassessmentNote} Additional reassessments at teacher discretion.</p>
+      </section>
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Required Materials</h3>
+        <ul class="syllabus-list">
+          <li>Laptop with reliable internet access</li>
+          <li>Writing utensils</li>
+          <li>Workbook and all other materials provided by the teacher</li>
+        </ul>
+      </section>
+      <section class="syllabus-section">
+        <h3 class="syllabus-section-title">Class Guidelines</h3>
+        <dl class="syllabus-rows">
+          <div><dt>Late work</dt><dd>10% off, with a Friday 4:00 PM cutoff.</dd></div>
+          <div><dt>Revisions</dt><dd>Revise submitted work for up to 50% of the credit back.</dd></div>
+        </dl>
       </section>`;
   }
 
@@ -1025,55 +1080,17 @@
           { id: 'Unit 5', title: 'Chemical Reactions', pending: true },
           { id: 'Unit 6', title: 'Reaction Stoichiometry', pending: true }
         ])}
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Grading Overview</h3>
-          <dl class="syllabus-dl">
-            <div><dt>Assessments</dt><dd>80%</dd></div>
-            <div><dt>Workbook Checks</dt><dd>20%</dd></div>
-          </dl>
-          <p class="section-note" style="margin-top:14px !important; font-size:14px !important; color:var(--ink-mid) !important;">Each unit has two 10-point workbook checks and one 50-point assessment. Six units across the semester.</p>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">How the Grading Works</h3>
-          <p>Daily work is where learning happens, and assessments are where it shows. Homework, labs, simulations, and practice all live in the workbook, where mistakes cost nothing and teach you the most. Keep up with it and you walk into every assessment ready.</p>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Workbook Checks - 20%</h3>
-          <p>All of the day-to-day work lives here: notes from lectures and simulations, labs, projects, presentations, practice problems, and case studies. Two checks per unit, 10 points each, scored on the rubric below.</p>
-          <dl class="syllabus-rows" style="margin-top:14px;">
-            <div><dt>Complete and current - 4 pts</dt><dd>Every assigned day is there: lecture and simulation notes, labs, practice problems.</dd></div>
-            <div><dt>Effort and content - 4 pts</dt><dd>Notes in your own words, practice problems worked, lab data recorded. Graded on effort, not accuracy.</dd></div>
-            <div><dt>Organization - 2 pts</dt><dd>Table of contents current, pages numbered, entries dated and titled.</dd></div>
-          </dl>
-          <p class="section-note">Checks are unannounced, usually one in each half of a unit. Do the day's work on the day it is assigned and you will be fine.</p>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Assessments - 80%</h3>
-          <p>This is where you show what you learned in a unit, and the one place where accuracy is graded.</p>
-          <dl class="syllabus-rows" style="margin-top:14px;">
-            <div><dt>How often</dt><dd>One assessment closes each unit: three per quarter, six across the semester.</dd></div>
-            <div><dt>What is on it</dt><dd>Only that unit's material, 50 points each.</dd></div>
-            <div><dt>Reassessment</dt><dd>One per quarter. A hard day should not define what you know, and this is the way back.</dd></div>
-            <div><dt>How it works</dt><dd>Finish that unit's workbook and bring a short error analysis: what went wrong, the corrected work, and what you understand now.</dd></div>
-            <div><dt>The retake</dt><dd>Covers only what you missed, on a set reassessment day, and the new score stands.</dd></div>
-          </dl>
-          <p class="section-note">Reassessment works best alongside office hours and questions asked as you go. One per quarter keeps it a steady habit rather than an end-of-quarter catch-up. Additional reassessments at teacher discretion.</p>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Required Materials</h3>
-          <ul class="syllabus-list">
-            <li>Laptop with reliable internet access</li>
-            <li>Writing utensils</li>
-            <li>Workbook and all other materials provided by the teacher</li>
-          </ul>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Class Guidelines</h3>
-          <dl class="syllabus-rows">
-            <div><dt>Late work</dt><dd>10% off, with a Friday 4:00 PM cutoff.</dd></div>
-            <div><dt>Revisions</dt><dd>Revise submitted work for up to 50% of the credit back.</dd></div>
-          </dl>
-        </section>`,
+        ${renderScienceGrading({
+          overview: 'Each unit has two 10-point workbook checks and one 50-point assessment. Six units across the semester.',
+          dailyWork: 'Homework, labs, simulations, and practice',
+          workbookItems: 'notes from lectures and simulations, labs, projects, presentations, practice problems, and case studies',
+          completeExamples: 'lecture and simulation notes, labs, practice problems',
+          effortExamples: 'Notes in your own words, practice problems worked, lab data recorded',
+          assessmentFrequency: 'One assessment closes each unit: three per quarter, six across the semester.',
+          assessmentScope: "Only that unit's material, 50 points each.",
+          reassessment: 'One per quarter.',
+          reassessmentNote: 'One per quarter keeps it a steady habit rather than an end-of-quarter catch-up.'
+        })}`,
       pending: ''
     },
     neuro: {
@@ -1091,55 +1108,17 @@
           { id: 'Unit 3', title: 'The Wiring of the Body (Beyond Neurons)', outcome: 'trace a signal from a sensor through the cord and the brain to a muscle, locate the break from the symptoms, and show that perception is a construction.' },
           { id: 'Capstone', title: 'Grand Rounds', outcome: 'diagnose an unfamiliar patient as a team, connecting a molecule to a symptom to a treatment, and defend it to the class.' }
         ])}
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Grading Overview</h3>
-          <dl class="syllabus-dl">
-            <div><dt>Assessments</dt><dd>80%</dd></div>
-            <div><dt>Workbook Checks</dt><dd>20%</dd></div>
-          </dl>
-          <p class="section-note" style="margin-top:14px !important; font-size:14px !important; color:var(--ink-mid) !important;">Each unit has two 10-point workbook checks and one 50-point assessment. Three units across the eight weeks.</p>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">How the Grading Works</h3>
-          <p>Daily work is where learning happens, and assessments are where it shows. Patient cases, labs, surgical reports, simulations, and practice all live in the workbook, where mistakes cost nothing and teach you the most. Keep up with it and you walk into every assessment ready.</p>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Workbook Checks - 20%</h3>
-          <p>All of the day-to-day work lives here: notes from lectures and simulations, patient cases, lab data, surgical reports, practice problems, and your running Addiction File. Two checks per unit, 10 points each, scored on the rubric below.</p>
-          <dl class="syllabus-rows" style="margin-top:14px;">
-            <div><dt>Complete and current - 4 pts</dt><dd>Every assigned day is there: lecture and simulation notes, cases, labs, practice problems.</dd></div>
-            <div><dt>Effort and content - 4 pts</dt><dd>Notes in your own words, practice problems worked, lab and surgery observations recorded. Graded on effort, not accuracy.</dd></div>
-            <div><dt>Organization - 2 pts</dt><dd>Table of contents current, pages numbered, entries dated and titled.</dd></div>
-          </dl>
-          <p class="section-note">Checks are unannounced, usually one in each half of a unit. Do the day's work on the day it is assigned and you will be fine.</p>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Assessments - 80%</h3>
-          <p>This is where you show what you learned in a unit, and the one place where accuracy is graded.</p>
-          <dl class="syllabus-rows" style="margin-top:14px;">
-            <div><dt>How often</dt><dd>One assessment closes each unit: three across the eight weeks.</dd></div>
-            <div><dt>What is on it</dt><dd>Only that unit's material, 50 points each. Expect to draw, label, explain, and propose a treatment rather than pick from a list.</dd></div>
-            <div><dt>Reassessment</dt><dd>One during the course. A hard day should not define what you know, and this is the way back.</dd></div>
-            <div><dt>How it works</dt><dd>Finish that unit's workbook and bring a short error analysis: what went wrong, the corrected work, and what you understand now.</dd></div>
-            <div><dt>The retake</dt><dd>Covers only what you missed, on a set reassessment day, and the new score stands.</dd></div>
-          </dl>
-          <p class="section-note">Reassessment works best alongside office hours and questions asked as you go. Additional reassessments at teacher discretion.</p>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Required Materials</h3>
-          <ul class="syllabus-list">
-            <li>Laptop with reliable internet access</li>
-            <li>Writing utensils</li>
-            <li>Workbook and all other materials provided by the teacher</li>
-          </ul>
-        </section>
-        <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Class Guidelines</h3>
-          <dl class="syllabus-rows">
-            <div><dt>Late work</dt><dd>10% off, with a Friday 4:00 PM cutoff.</dd></div>
-            <div><dt>Revisions</dt><dd>Revise submitted work for up to 50% of the credit back.</dd></div>
-          </dl>
-        </section>`,
+        ${renderScienceGrading({
+          overview: 'Each unit has two 10-point workbook checks and one 50-point assessment. Three units across the eight weeks.',
+          dailyWork: 'Patient cases, labs, surgical reports, simulations, and practice',
+          workbookItems: 'notes from lectures and simulations, patient cases, lab data, surgical reports, practice problems, and your running Addiction File',
+          completeExamples: 'lecture and simulation notes, cases, labs, practice problems',
+          effortExamples: 'Notes in your own words, practice problems worked, lab and surgery observations recorded',
+          assessmentFrequency: 'One assessment closes each unit: three across the eight weeks.',
+          assessmentScope: "Only that unit's material, 50 points each. Expect to draw, label, explain, and propose a treatment rather than pick from a list.",
+          reassessment: 'One during the course.',
+          reassessmentNote: ''
+        })}`,
       pending: 'how Grand Rounds is scored'
     }
   };
@@ -1670,6 +1649,7 @@
       const active = t.dataset.course === course;
       t.setAttribute('aria-selected', String(active));
       t.tabIndex = active ? 0 : -1;
+      if (active) requestAnimationFrame(() => t.scrollIntoView({ block: 'nearest', inline: 'center' }));
     });
     Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== course; });
     // The title names the saved PDF after the open course.
