@@ -1027,17 +1027,17 @@
         <section class="syllabus-section">
           <h3 class="syllabus-section-title">Grading Overview</h3>
           <dl class="syllabus-dl">
-            <div><dt>Assessments</dt><dd>80%</dd></div>
-            <div><dt>Workbook Checks</dt><dd>20%</dd></div>
+            <div><dt>Assessments</dt><dd>70%</dd></div>
+            <div><dt>Workbook Checks</dt><dd>30%</dd></div>
           </dl>
-          <p class="section-note" style="margin-top:14px !important; font-size:14px !important; color:var(--ink-mid) !important;">Each unit is 100 points: two 10-point workbook checks plus one 80-point assessment. Six units, 600 points for the semester.</p>
+          <p class="section-note" style="margin-top:14px !important; font-size:14px !important; color:var(--ink-mid) !important;">Each unit is 70 points: two 10-point workbook checks plus one 50-point assessment. Six units, 420 points for the semester.</p>
         </section>
         <section class="syllabus-section">
           <h3 class="syllabus-section-title">How the Grading Works</h3>
           <p>Daily work is where learning happens, and assessments are where it shows. Homework, labs, simulations, and practice all live in the workbook, where mistakes cost nothing and teach you the most. Keep up with it and you walk into every assessment ready.</p>
         </section>
         <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Workbook Checks - 20%</h3>
+          <h3 class="syllabus-section-title">Workbook Checks - 30%</h3>
           <p>All of the day-to-day work lives here: notes from lectures and simulations, labs, projects, presentations, practice problems, and case studies. Two checks per unit, 10 points each, scored on the rubric below.</p>
           <dl class="syllabus-rows" style="margin-top:14px;">
             <div><dt>Complete and current - 4 pts</dt><dd>Every assigned day is there: lecture and simulation notes, labs, practice problems.</dd></div>
@@ -1047,11 +1047,11 @@
           <p class="section-note">Checks are unannounced, usually one in each half of a unit. Do the day's work on the day it is assigned and you will be fine.</p>
         </section>
         <section class="syllabus-section">
-          <h3 class="syllabus-section-title">Assessments - 80%</h3>
+          <h3 class="syllabus-section-title">Assessments - 70%</h3>
           <p>This is where you show what you learned in a unit, and the one place where accuracy is graded.</p>
           <dl class="syllabus-rows" style="margin-top:14px;">
             <div><dt>How often</dt><dd>One assessment closes each unit: three per quarter, six across the semester.</dd></div>
-            <div><dt>What is on it</dt><dd>Only that unit's material, 80 points each.</dd></div>
+            <div><dt>What is on it</dt><dd>Only that unit's material, 50 points each.</dd></div>
             <div><dt>Reassessment</dt><dd>One per quarter. A hard day should not define what you know, and this is the way back.</dd></div>
             <div><dt>How it works</dt><dd>Finish that unit's workbook and bring a short error analysis: what went wrong, the corrected work, and what you understand now.</dd></div>
             <div><dt>The retake</dt><dd>Covers only what you missed, on a set reassessment day, and the new score stands.</dd></div>
@@ -1074,6 +1074,72 @@
           </dl>
         </section>`,
       pending: ''
+    },
+    neuro: {
+      block: 'Block B',
+      hub: { url: 'https://inquiry.sparklearningstudio.ai/neuroscience', display: 'inquiry.sparklearningstudio.ai/neuroscience' },
+      lede: `
+        <section class="syllabus-section syllabus-lead">
+          <h3 class="syllabus-section-title">Course Description</h3>
+          <p>The purpose of Neuroscience is to give students a working understanding of the nervous system while emphasizing inquiry, clinical reasoning, and critical thinking. The course follows an <strong>inquiry-driven learning cycle</strong> built from medical investigations: every unit opens with a patient, and students make predictions, test them through simulations, labs, and three surgeries, and build explanatory models before formal instruction. One question runs through all eight weeks: how does activity in nervous tissue become movement, perception, behavior, and the decisions that shape our world? Three units follow the signal inside neurons, between neurons, and beyond neurons, and the course closes with Grand Rounds, where teams take a new patient from molecule to diagnosis.</p>
+        </section>`,
+      sections: `
+        ${renderLearning('Unit', [
+          { id: 'Unit 1', title: 'The Action Potential (Inside Neurons)', outcome: 'draw and explain an action potential at one patch of membrane, and name what breaks when a sodium or potassium channel fails.' },
+          { id: 'Unit 2', title: 'The Synapse (Between Neurons)', outcome: 'explain how neurons talk to each other, how go and stop signals set the odds of firing, where drugs act, and how a network tips into a seizure or a withdrawal.' },
+          { id: 'Unit 3', title: 'The Wiring of the Body (Beyond Neurons)', outcome: 'trace a signal from a sensor through the cord and the brain to a muscle, locate the break from the symptoms, and show that perception is a construction.' },
+          { id: 'Capstone', title: 'Grand Rounds', outcome: 'diagnose an unfamiliar patient as a team, connecting a molecule to a symptom to a treatment, and defend it to the class.' }
+        ])}
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">Grading Overview</h3>
+          <dl class="syllabus-dl">
+            <div><dt>Assessments</dt><dd>70%</dd></div>
+            <div><dt>Workbook Checks</dt><dd>30%</dd></div>
+          </dl>
+          <p class="section-note" style="margin-top:14px !important; font-size:14px !important; color:var(--ink-mid) !important;">Each unit is 70 points: two 10-point workbook checks plus one 50-point assessment. Three units, 210 points across the eight weeks.</p>
+        </section>
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">How the Grading Works</h3>
+          <p>Daily work is where learning happens, and assessments are where it shows. Patient cases, labs, surgical reports, simulations, and practice all live in the workbook, where mistakes cost nothing and teach you the most. Keep up with it and you walk into every assessment ready.</p>
+        </section>
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">Workbook Checks - 30%</h3>
+          <p>All of the day-to-day work lives here: notes from lectures and simulations, patient cases, lab data, surgical reports, practice problems, and your running Addiction File. Two checks per unit, 10 points each, scored on the rubric below.</p>
+          <dl class="syllabus-rows" style="margin-top:14px;">
+            <div><dt>Complete and current - 4 pts</dt><dd>Every assigned day is there: lecture and simulation notes, cases, labs, practice problems.</dd></div>
+            <div><dt>Effort and content - 4 pts</dt><dd>Notes in your own words, practice problems worked, lab and surgery observations recorded. Graded on effort, not accuracy.</dd></div>
+            <div><dt>Organization - 2 pts</dt><dd>Table of contents current, pages numbered, entries dated and titled.</dd></div>
+          </dl>
+          <p class="section-note">Checks are unannounced, usually one in each half of a unit. Do the day's work on the day it is assigned and you will be fine.</p>
+        </section>
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">Assessments - 70%</h3>
+          <p>This is where you show what you learned in a unit, and the one place where accuracy is graded.</p>
+          <dl class="syllabus-rows" style="margin-top:14px;">
+            <div><dt>How often</dt><dd>One assessment closes each unit: three across the eight weeks.</dd></div>
+            <div><dt>What is on it</dt><dd>Only that unit's material, 50 points each. Expect to draw, label, explain, and propose a treatment rather than pick from a list.</dd></div>
+            <div><dt>Reassessment</dt><dd>One during the course. A hard day should not define what you know, and this is the way back.</dd></div>
+            <div><dt>How it works</dt><dd>Finish that unit's workbook and bring a short error analysis: what went wrong, the corrected work, and what you understand now.</dd></div>
+            <div><dt>The retake</dt><dd>Covers only what you missed, on a set reassessment day, and the new score stands.</dd></div>
+          </dl>
+          <p class="section-note">Reassessment works best alongside office hours and questions asked as you go. Additional reassessments at teacher discretion.</p>
+        </section>
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">Required Materials</h3>
+          <ul class="syllabus-list">
+            <li>Laptop with reliable internet access</li>
+            <li>Writing utensils</li>
+            <li>Workbook and all other materials provided by the teacher</li>
+          </ul>
+        </section>
+        <section class="syllabus-section">
+          <h3 class="syllabus-section-title">Class Guidelines</h3>
+          <dl class="syllabus-rows">
+            <div><dt>Late work</dt><dd>10% off, with a Friday 4:00 PM cutoff.</dd></div>
+            <div><dt>Revisions</dt><dd>Revise submitted work for up to 50% of the credit back.</dd></div>
+          </dl>
+        </section>`,
+      pending: 'how Grand Rounds is scored'
     }
   };
   const DEFAULT_PENDING = 'course description, unit learning goals and standards map, required materials, grading overview, and class guidelines (late work, make-up work, reassessments, accommodations, college visits)';
@@ -1126,7 +1192,7 @@
     t4sg: ['Alexa','Aurora','Carina','Carter','Dana','Dylan','Franchesca','Gabe','Henry','Isabella','Kai','Katie','Oona','Peter','Riley','Ryan','Weston','Winter'],
     chemistry: ['Ailani','Alice','Amaeya','Archie','Asher','Benjamin','Benny','Camila','Carter','Cezzie','Charlie','Cleo','Cole','Dahlia','Elijah','Evelyn','Fabian','Gigi','Hayden','Hazel','Jack','Jaqui','Kai','Keller','Khloe','Lluvia','Logan','Maddox','Margaret','Milan','Nathan','Noa','Parker','Preston','Reed','Remy','Ryan','Ryken','Sabine','Simone','Stella','Theodore'],
     biochem: [],
-    neuro: []
+    neuro: ['An','Arman','Ashlyn','Avery','Cooper','Derek','Francesca','Gabriel','Isabella','Jesse','Leif','Madeleine','Nicholas','Quinn','Riley']
   };
   const TEACHER = 'Ramsey';
   const ADMIN_EMAILS = new Set([
