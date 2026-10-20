@@ -1166,14 +1166,15 @@
   const adminProvider = new GoogleAuthProvider();
   adminProvider.setCustomParameters({ prompt: 'select_account' });
 
-  // First names only, per Ramsey. No collisions inside a course, so a first
-  // name is unambiguous. Students not listed can add themselves.
+  // First names only, per Ramsey. Students in open rosters can add themselves;
+  // strict rosters stay limited to the teacher-provided list.
   const ROSTERS = {
     t4sg: ['Alexa','Aurora','Carina','Carter','Dana','Dylan','Franchesca','Gabe','Henry','Isabella','Kai','Katie','Oona','Peter','Riley','Ryan','Weston','Winter'],
     chemistry: ['Ailani','Alice','Amaeya','Archie','Asher','Benjamin','Benny','Camila','Carter','Cezzie','Charlie','Cleo','Cole','Dahlia','Elijah','Evelyn','Fabian','Gigi','Hayden','Hazel','Jack','Jaqui','Kai','Keller','Khloe','Lluvia','Logan','Maddox','Margaret','Milan','Nathan','Noa','Parker','Preston','Reed','Remy','Ryan','Ryken','Sabine','Simone','Stella','Theodore'],
     biochem: [],
-    neuro: ['An','Arman','Ashlyn','Avery','Cooper','Derek','Francesca','Gabriel','Isabella','Jesse','Leif','Madeleine','Nicholas','Quinn','Riley']
+    neuro: ['Aidan','Asher','Bailey','Elijah','Hana','Ian','Luis','Maia','Miles','Simone']
   };
+  const STRICT_ROSTERS = new Set(['neuro']);
   const TEACHER = 'Ramsey';
   const ADMIN_EMAILS = new Set([
     'ramsey.musallam@gmail.com',
@@ -1214,12 +1215,17 @@
   // the option persists for everyone next time.
   const extraNames = {};
   async function loadExtraNames(course) {
+    if (STRICT_ROSTERS.has(course)) {
+      extraNames[course] = [];
+      return;
+    }
     try {
       const snap = await getDoc(doc(db, 'rosters', course));
       extraNames[course] = (snap.exists() && Array.isArray(snap.data().names)) ? snap.data().names : [];
     } catch (_) { extraNames[course] = []; }
   }
   async function rememberName(course, name) {
+    if (STRICT_ROSTERS.has(course)) return;
     const list = extraNames[course] || [];
     const k = String(name).trim().toLowerCase();
     if ((ROSTERS[course] || []).some(n => n.toLowerCase() === k) || list.some(n => n.trim().toLowerCase() === k)) return;
@@ -1232,7 +1238,8 @@
 
   function rosterFor(course) {
     const byKey = new Map();
-    [...(ROSTERS[course] || []), ...(extraNames[course] || [])].forEach(n => {
+    const additions = STRICT_ROSTERS.has(course) ? [] : (extraNames[course] || []);
+    [...(ROSTERS[course] || []), ...additions].forEach(n => {
       const k = String(n).trim().toLowerCase();
       if (k && !byKey.has(k)) byKey.set(k, String(n).trim());
     });
@@ -1259,7 +1266,7 @@
   // the verified admin view, so the interface never invites impersonation.
   function nameOptions(course, selected, includeTeacher = false) {
     const names = rosterFor(course).filter(n => includeTeacher || !isTeacherName(n));
-    const safeSelected = !includeTeacher && isTeacherName(selected) ? '' : selected;
+    const safeSelected = (!includeTeacher && isTeacherName(selected)) || (STRICT_ROSTERS.has(course) && !names.includes(selected)) ? '' : selected;
     if (safeSelected && !names.includes(safeSelected)) names.unshift(safeSelected);
     return (includeTeacher
       ? `<option value="${esc(TEACHER)}"${safeSelected === TEACHER ? ' selected' : ''}>${esc(TEACHER)} (teacher)</option>`
@@ -1298,7 +1305,7 @@
             <select class="qa-select" data-qa-name aria-label="Your name">
               <option value="">Your name...</option>
               ${nameOptions(course, isAdmin ? TEACHER : savedName(course), isAdmin)}
-              <option value="__other">My name isn't listed</option>
+              ${STRICT_ROSTERS.has(course) ? '' : '<option value="__other">My name isn\'t listed</option>'}
             </select>
             <input class="qa-newname" data-qa-newname type="text" placeholder="Your first name" maxlength="40" hidden aria-label="Type your first name" />
             <textarea class="qa-text" data-qa-text rows="1" maxlength="1000" placeholder="What's your question?" aria-label="Your question"></textarea>
@@ -1461,7 +1468,7 @@
               <div class="qa-replyform" data-replyform id="${replyFormId}">
                 ${isAdmin ? '' : `<select data-r-name aria-label="Your name">
                   <option value="">Your name...</option>${rosterOpts}
-                  <option value="__other">My name isn't listed</option>
+                  ${STRICT_ROSTERS.has(course) ? '' : '<option value="__other">My name isn\'t listed</option>'}
                 </select>
                 <input data-r-newname type="text" maxlength="40" placeholder="Your first name" aria-label="Type your first name" hidden />`}
                 <textarea data-r-text rows="1" maxlength="2000" placeholder="${isAdmin ? 'Your answer...' : 'Add to this thread...'}" aria-label="Your reply"></textarea>
