@@ -345,6 +345,7 @@
     line-height: 1.55 !important;
   }
   .learning-outcome strong { color: var(--accent); }
+  .learning-outcome.pending { color: var(--ink-mid); font-style: italic; }
   .learning-meta {
     display: flex;
     flex-wrap: wrap;
@@ -994,7 +995,7 @@
             ];
             return `<article class="learning-unit">
               <div class="learning-unit-head"><span class="learning-unit-id">${unit.id}</span><span class="learning-unit-title">${unit.title}</span></div>
-              ${unit.outcome ? `<p class="learning-outcome"><strong>Students will be able to</strong> ${unit.outcome}</p>` : ''}
+              ${unit.outcome ? `<p class="learning-outcome"><strong>Students will be able to</strong> ${unit.outcome}</p>` : unit.pending ? `<p class="learning-outcome pending">Learning outcome coming when the unit opens.</p>` : ''}
               ${tags.length ? `<div class="learning-meta">${tags.join('')}</div>` : ''}
             </article>`;
           }).join('')}
@@ -1017,12 +1018,12 @@
         </section>`,
       sections: `
         ${renderLearning('Unit', [
-          { id: 'Unit 1', title: 'Atomic Structure' },
-          { id: 'Unit 2', title: 'Ionic Bonding' },
-          { id: 'Unit 3', title: 'Covalent Bonding' },
-          { id: 'Unit 4', title: 'States of Matter' },
-          { id: 'Unit 5', title: 'Chemical Reactions' },
-          { id: 'Unit 6', title: 'Reaction Stoichiometry' }
+          { id: 'Unit 1', title: 'Atomic Structure', outcome: 'describe what an atom is made of, use the periodic table to find its protons, neutrons, and electrons, and explain how the arrangement of electrons shapes how an element behaves.' },
+          { id: 'Unit 2', title: 'Ionic Bonding', outcome: 'explain why atoms gain or lose electrons to form ions, predict the charge an element forms, and write the name and formula of an ionic compound.' },
+          { id: 'Unit 3', title: 'Covalent Bonding', outcome: 'explain how atoms share electrons, build a Lewis structure from the valence shell, and predict the shape of a molecule from the atoms and lone pairs around its center.' },
+          { id: 'Unit 4', title: 'States of Matter', pending: true },
+          { id: 'Unit 5', title: 'Chemical Reactions', pending: true },
+          { id: 'Unit 6', title: 'Reaction Stoichiometry', pending: true }
         ])}
         <section class="syllabus-section">
           <h3 class="syllabus-section-title">Grading Overview</h3>
